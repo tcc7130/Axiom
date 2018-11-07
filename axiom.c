@@ -1,21 +1,21 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#define MAX_LENGTH 255
 
 void lex(FILE *fp){
-	char *buf;
 	char *token;
-        token = (char *) malloc (15);	
-   	if(fgets(token, 255, fp)!=NULL){
-		char* i = token;
-		char* j = token;
-		while(*j != 0)
+	int c;
+	size_t n = 0;
+        token = (char *) malloc (MAX_LENGTH);
+		
+   	if(fgets(token, MAX_LENGTH, fp)!=NULL){
+		
+		while((c = fgetc(fp)) != EOF)
 		{
-			*i = *j++;
-			if(*i != ' ')
-				i++;
+			token[n++] = (char) c;
 		}
-		*i = 0;
+		token[n] = 0;
 		printf("%s", token);
     	}	
 }
