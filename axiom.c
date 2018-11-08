@@ -66,7 +66,7 @@ void lex(FILE *fp){
 	size_t n = 0;
         token = (char *) malloc (MAX_LENGTH);
 		
-   	if(fgets(token, MAX_LENGTH, fp)!=NULL){
+   	if(fp!=NULL){
 		while((c = fgetc(fp)) != EOF){
 			if(isspace(c)==0){
 				tokens[n] = (struct Token) check(c);
