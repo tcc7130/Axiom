@@ -7,6 +7,7 @@
 
 const char *keywords[] = {"while","for","int","char","str","double","if","else","elif","read","print","println"};
 int isKeyword(char *w);
+
 struct Token {
 	char *name;
 	char *value;

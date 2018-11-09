@@ -13,12 +13,12 @@ int endsToken(char c){
 }
 
 struct token *checksToken(char *word, struct token *tok){
-	//printf("%s\n",word);
+	//printf("%i\n",COMA);
 	if(!strcmp(word, "int") || !strcmp(word, "double") || !strcmp(word, "char") || !strcmp(word, "str")){
 		return createToken(VARIABLE_TYPE, word, tok);
 	}
 	else if(!strcmp(word, ";")){
-		return createToken(22, word, tok);
+		return createToken(SEMICOLON, word, tok);
 	}
 	else if(!strcmp(word, "(")){
 		tok->next = malloc(sizeof(struct token));
@@ -80,21 +80,34 @@ struct token *checksToken(char *word, struct token *tok){
 		printf("Found token: %s\n", tok->content);			
 		return tok;
 	}
-	else{
-		if(strlen(word) > 0){
-			tok->next = malloc(sizeof(struct token));
-			tok = tok->next;
-			tok->id = -1;
-			tok->content = malloc(sizeof(word));
-			strcpy(tok->content, word);
-			tok->next = NULL;
-			printf("Undefined token: %s\n", tok->content);
-			return tok;
+	else if(isalpha(word[0])){
+		for(int i = 1; i < strlen(word); i++){
+			if(!isalpha(word[i]) && !isdigit(word[i])){
+				//return createToken(-1, word, tok);
+				tok->next = malloc(sizeof(struct token));
+				tok = tok->next;
+				tok->id = -1;
+				tok->content = malloc(sizeof(word));
+				strcpy(tok->content, word);
+				tok->next = NULL;
+				printf("Undefined token: %s\n", tok->content);
+				return tok;
+			}
 		}
-		else
-			return tok;
+		return createToken(0, word, tok);
 	}
-	return NULL;
+	else if(strlen(word) > 0){
+		tok->next = malloc(sizeof(struct token));
+		tok = tok->next;
+		tok->id = -1;
+		tok->content = malloc(sizeof(word));
+		strcpy(tok->content, word);
+		tok->next = NULL;
+		printf("Undefined token: %s\n", tok->content);
+		return tok;
+	}
+	//else
+		return tok;
 }
 
 struct token *createToken(int id, char *word, struct token *tok){
@@ -133,46 +146,156 @@ void lex(FILE *fp){
 
 	int j;
 	int isString = 0;
-   	while(fgets(buf, 255, fp)){
+
+  while(fgets(buf, 255, fp)){
    		//printf("\nbuf: %s\n", buf);
 		memset(word, 0, sizeof(word));
 		j = 0;
 		for(int i = 0; buf[i] != 0; i++){
-			if(buf[i] != '"'){
-				currentToken = checksToken(word, currentToken);
-				memset(word, 0, sizeof(word));
-				j=0;
+    //printf("index: %i, word: %s\n",i, word);
+			if(!isString){
+				//printf("1\n");
 				switch(buf[i]){
 					case ' ':
+						currentToken = checksToken(word, currentToken);
+						memset(word, 0, sizeof(word));
+						j = 0;
 						break;
 					case ';':
+						currentToken = checksToken(word, currentToken);
+						memset(word, 0, sizeof(word));
+						j = 0;
 						currentToken = checksToken(";", currentToken);
 						break;
 					case '(':
+						currentToken = checksToken(word, currentToken);
+						memset(word, 0, sizeof(word));
+						j = 0;
 						currentToken = checksToken("(", currentToken);
 						break;
 					case ')':
+						currentToken = checksToken(word, currentToken);
+						memset(word, 0, sizeof(word));
+						j = 0;
 						currentToken = checksToken(")", currentToken);
 						break;
 					case '{':
+						currentToken = checksToken(word, currentToken);
+						memset(word, 0, sizeof(word));
+						j = 0;
 						currentToken = checksToken("{", currentToken);
 						break;
 					case '}':
+						currentToken = checksToken(word, currentToken);
+						memset(word, 0, sizeof(word));
+						j = 0;
 						currentToken = checksToken("}", currentToken);
 						break;
 					case '[':
+						currentToken = checksToken(word, currentToken);
+						memset(word, 0, sizeof(word));
+						j = 0;
 						currentToken = checksToken("[", currentToken);
 						break;
 					case ']':
+						currentToken = checksToken(word, currentToken);
+						memset(word, 0, sizeof(word));
+						j = 0;
 						currentToken = checksToken("]", currentToken);
+						break;
+					case '"':
+						currentToken = checksToken(word, currentToken);
+						memset(word, 0, sizeof(word));
+						j = 0;
+						isString = 1 - isString;
+						break;
+					case '>':
+						currentToken = checksToken(word, currentToken);
+						memset(word, 0, sizeof(word));
+						j = 0;
+						if(buf[i+1] == '='){
+							currentToken = createToken(COMPARE_OP, ">=", currentToken);
+							i++;
+						}
+						else
+							currentToken = createToken(COMPARE_OP, ">", currentToken);
+						break;
+					case '<':
+						currentToken = checksToken(word, currentToken);
+						memset(word, 0, sizeof(word));
+						j = 0;
+						if(buf[i+1] == '='){
+							currentToken = createToken(COMPARE_OP, "<=", currentToken);
+							i++;
+						}
+						else
+							currentToken = createToken(COMPARE_OP, "<", currentToken);
+						break;
+					case '=':
+						currentToken = checksToken(word, currentToken);
+						memset(word, 0, sizeof(word));
+						j = 0;
+						if(buf[i+1] == '='){
+							currentToken = createToken(COMPARE_OP, "==", currentToken);
+							i++;
+						}
+						else
+							currentToken = createToken(ASSIGN, "=", currentToken);
+						break;
+					case '!':
+						currentToken = checksToken(word, currentToken);
+						memset(word, 0, sizeof(word));
+						j = 0;
+						if(buf[i+1] == '='){
+							currentToken = createToken(COMPARE_OP, "!=", currentToken);
+							//i++;
+						}
+						else
+							currentToken = checksToken("!", currentToken);
+						break;
+					case '+':
+						currentToken = checksToken(word, currentToken);
+						memset(word, 0, sizeof(word));
+						j = 0;
+						if(buf[i+1] == '+'){
+							currentToken = createToken(INCREMENT, "++", currentToken);
+							i++;
+						}
+						else
+							currentToken = createToken(ARITMETIC_OP, "+", currentToken);
+						break;
+					case '-':
+						currentToken = checksToken(word, currentToken);
+						memset(word, 0, sizeof(word));
+						j = 0;
+						if(buf[i+1] == '-'){
+							currentToken = createToken(DECREMENT, "--", currentToken);
+							i++;
+						}
+						else
+							currentToken = createToken(ARITMETIC_OP, "-", currentToken);
+						break;
 				}
 
-			if(!isspace(buf[i]) && buf[i] != '(' && buf[i] != ')' 
+				if(!isspace(buf[i]) && buf[i] != '(' && buf[i] != ')' 
 				&& buf[i] != '{' && buf[i] != '}' && buf[i] != '[' 
-				&& buf[i] != ']' && buf[i] != ';' && buf[i] != ','){
+				&& buf[i] != ']' && buf[i] != ';' && buf[i] != ','
+				&& buf[i] != '>' && buf[i] != '<' && buf[i] != '='
+				&& buf[i] != '!' && buf[i] != '-' && buf[i] != '+'){
+					word[j] = buf[i];
+					j++;
+				}
+			}
+			else{
 				word[j] = buf[i];
 				j++;
-			}
+				if(buf[i] == '"'){
+					currentToken = createToken(27, word, currentToken);
+					memset(word, 0, sizeof(word));
+					j = 0;
+					isString = 1 - isString;
+				}
+			}		
 		}
 	}
 
