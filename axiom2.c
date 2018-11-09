@@ -131,57 +131,62 @@ void lex(FILE *fp){
 	char *word2 = "";
 
 	int j;
+	int isString = 0;
    	while(fgets(buf, 255, fp)){
    		//printf("\nbuf: %s\n", buf);
 		memset(word, 0, sizeof(word));
 		j = 0;
 		for(int i = 0; buf[i] != 0; i++){
-			if(buf[i] == ' '){
-				currentToken = checksToken(word, currentToken);
-				memset(word, 0, sizeof(word));
-				j = 0;
-			}
-			else if(buf[i] == ';'){
-				currentToken = checksToken(word, currentToken);
-				memset(word, 0, sizeof(word));
-				j = 0;
-				currentToken = checksToken(";", currentToken);
-			}
-			else if(buf[i] == '('){
-				currentToken = checksToken(word, currentToken);
-				memset(word, 0, sizeof(word));
-				j = 0;
-				currentToken = checksToken("(", currentToken);
-			}
-			else if(buf[i] == ')'){
-				currentToken = checksToken(word, currentToken);
-				memset(word, 0, sizeof(word));
-				j = 0;
-				currentToken = checksToken(")", currentToken);
-			}
-			else if(buf[i] == '{'){
-				currentToken = checksToken(word, currentToken);
-				memset(word, 0, sizeof(word));
-				j = 0;
-				currentToken = checksToken("{", currentToken);
-			}
-			else if(buf[i] == '}'){
-				currentToken = checksToken(word, currentToken);
-				memset(word, 0, sizeof(word));
-				j = 0;
-				currentToken = checksToken("}", currentToken);
-			}
-			else if(buf[i] == '['){
-				currentToken = checksToken(word, currentToken);
-				memset(word, 0, sizeof(word));
-				j = 0;
-				currentToken = checksToken("[", currentToken);
-			}
-			else if(buf[i] == ']'){
-				currentToken = checksToken(word, currentToken);
-				memset(word, 0, sizeof(word));
-				j = 0;
-				currentToken = checksToken("]", currentToken);
+			switch(buf[i]){
+				case ' ':
+					currentToken = checksToken(word, currentToken);
+					memset(word, 0, sizeof(word));
+					j = 0;
+					break;
+				case ';':
+					currentToken = checksToken(word, currentToken);
+					memset(word, 0, sizeof(word));
+					j = 0;
+					currentToken = checksToken(";", currentToken);
+					break;
+				case '(':
+					currentToken = checksToken(word, currentToken);
+					memset(word, 0, sizeof(word));
+					j = 0;
+					currentToken = checksToken("(", currentToken);
+					break;
+				case ')':
+					currentToken = checksToken(word, currentToken);
+					memset(word, 0, sizeof(word));
+					j = 0;
+					currentToken = checksToken(")", currentToken);
+					break;
+				case '{':
+					currentToken = checksToken(word, currentToken);
+					memset(word, 0, sizeof(word));
+					j = 0;
+					currentToken = checksToken("{", currentToken);
+					break;
+				case '}':
+					currentToken = checksToken(word, currentToken);
+					memset(word, 0, sizeof(word));
+					j = 0;
+					currentToken = checksToken("}", currentToken);
+					break;
+				case '[':
+					currentToken = checksToken(word, currentToken);
+					memset(word, 0, sizeof(word));
+					j = 0;
+					currentToken = checksToken("[", currentToken);
+					break;
+				case ']':
+					currentToken = checksToken(word, currentToken);
+					memset(word, 0, sizeof(word));
+					j = 0;
+					currentToken = checksToken("]", currentToken);
+					break;
+				case '"':
+					break;
 			}
 
 			if(!isspace(buf[i]) && buf[i] != '(' && buf[i] != ')' 
@@ -190,14 +195,6 @@ void lex(FILE *fp){
 				word[j] = buf[i];
 				j++;
 			}
-			// if(!isspace(buf[i]) && !buf[i] == ''){
-			// 	word[j] = buf[i];
-			// 	j++;
-			// }
-
-			// if(!strcmp(word,"int")){
-			// }
-			//printf("%s\n", word);
 		}
 	}
 
