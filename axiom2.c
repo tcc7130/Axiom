@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "axiom2.h"
+#include "axiom.h"
 
 int endsToken(char c){
 	if(c == ' ' || c == ';' || c == '(' || c == ')' || c == '{' || c == '}'){
@@ -13,35 +13,11 @@ int endsToken(char c){
 
 struct token *checksToken(char *word, struct token *tok){
 	//printf("%s\n",word);
-	if(!strcmp(word, "int")){
-		tok->next = malloc(sizeof(struct token));
-		tok = tok->next;
-		tok->id = 1;
-		tok->content = malloc(sizeof(word));
-		strcpy(tok->content, word);
-		tok->next = NULL;
-		printf("Found token: %s\n", tok->content);
-		return tok;
-	}
-	else if(!strcmp(word, "x[]")){
-		tok->next = malloc(sizeof(struct token));
-		tok = tok->next;
-		tok->id = 2;
-		tok->content = malloc(sizeof(word));
-		strcpy(tok->content, word);
-		tok->next = NULL;
-		printf("Found token: %s\n", tok->content);			
-		return tok;
+	if(!strcmp(word, "int") || !strcmp(word, "double") || !strcmp(word, "char") || !strcmp(word, "str")){
+		return createToken(VARIABLE_TYPE, word, tok);
 	}
 	else if(!strcmp(word, ";")){
-		tok->next = malloc(sizeof(struct token));
-		tok = tok->next;
-		tok->id = 3;
-		tok->content = malloc(sizeof(word));
-		strcpy(tok->content, word);
-		tok->next = NULL;
-		printf("Found token: %s\n", tok->content);			
-		return tok;
+		return createToken(22, word, tok);
 	}
 	else if(!strcmp(word, "(")){
 		tok->next = malloc(sizeof(struct token));
@@ -83,15 +59,39 @@ struct token *checksToken(char *word, struct token *tok){
 		printf("Found token: %s\n", tok->content);			
 		return tok;
 	}
-	else{
+	else if(!strcmp(word, "[")){
 		tok->next = malloc(sizeof(struct token));
 		tok = tok->next;
-		tok->id = -1;
+		tok->id = 3;
 		tok->content = malloc(sizeof(word));
 		strcpy(tok->content, word);
 		tok->next = NULL;
-		printf("Undefined token: %s\n", tok->content);
+		printf("Found token: %s\n", tok->content);			
 		return tok;
+	}
+	else if(!strcmp(word, "]")){
+		tok->next = malloc(sizeof(struct token));
+		tok = tok->next;
+		tok->id = 3;
+		tok->content = malloc(sizeof(word));
+		strcpy(tok->content, word);
+		tok->next = NULL;
+		printf("Found token: %s\n", tok->content);			
+		return tok;
+	}
+	else{
+		if(strlen(word) > 0){
+			tok->next = malloc(sizeof(struct token));
+			tok = tok->next;
+			tok->id = -1;
+			tok->content = malloc(sizeof(word));
+			strcpy(tok->content, word);
+			tok->next = NULL;
+			printf("Undefined token: %s\n", tok->content);
+			return tok;
+		}
+		else
+			return tok;
 	}
 	return NULL;
 }
@@ -103,7 +103,7 @@ struct token *createToken(int id, char *word, struct token *tok){
 	tok->content = malloc(sizeof(word));
 	strcpy(tok->content, word);
 	tok->next = NULL;
-	printf("Undefined token: %s\n", tok->content);
+	printf("Found token: %s\n", tok->content);
 	return tok;
 }
 
@@ -141,18 +141,60 @@ void lex(FILE *fp){
 				memset(word, 0, sizeof(word));
 				j = 0;
 			}
-			if(buf[i] == ';'){
+			else if(buf[i] == ';'){
 				currentToken = checksToken(word, currentToken);
 				memset(word, 0, sizeof(word));
 				j = 0;
-				checksToken(";", currentToken);
-				printf("HOLA\n");
+				currentToken = checksToken(";", currentToken);
+			}
+			else if(buf[i] == '('){
+				currentToken = checksToken(word, currentToken);
+				memset(word, 0, sizeof(word));
+				j = 0;
+				currentToken = checksToken("(", currentToken);
+			}
+			else if(buf[i] == ')'){
+				currentToken = checksToken(word, currentToken);
+				memset(word, 0, sizeof(word));
+				j = 0;
+				currentToken = checksToken(")", currentToken);
+			}
+			else if(buf[i] == '{'){
+				currentToken = checksToken(word, currentToken);
+				memset(word, 0, sizeof(word));
+				j = 0;
+				currentToken = checksToken("{", currentToken);
+			}
+			else if(buf[i] == '}'){
+				currentToken = checksToken(word, currentToken);
+				memset(word, 0, sizeof(word));
+				j = 0;
+				currentToken = checksToken("}", currentToken);
+			}
+			else if(buf[i] == '['){
+				currentToken = checksToken(word, currentToken);
+				memset(word, 0, sizeof(word));
+				j = 0;
+				currentToken = checksToken("[", currentToken);
+			}
+			else if(buf[i] == ']'){
+				currentToken = checksToken(word, currentToken);
+				memset(word, 0, sizeof(word));
+				j = 0;
+				currentToken = checksToken("]", currentToken);
 			}
 
-			if(buf[i] != ' ' && buf[i] != '\t'){
+			if(!isspace(buf[i]) && buf[i] != '(' && buf[i] != ')' 
+				&& buf[i] != '{' && buf[i] != '}' && buf[i] != '[' 
+				&& buf[i] != ']' && buf[i] != ';' && buf[i] != ','){
 				word[j] = buf[i];
 				j++;
 			}
+			// if(!isspace(buf[i]) && !buf[i] == ''){
+			// 	word[j] = buf[i];
+			// 	j++;
+			// }
+
 			// if(!strcmp(word,"int")){
 			// }
 			//printf("%s\n", word);
