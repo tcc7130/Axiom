@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include "axiom.h"
 
 int endsToken(char c){
@@ -137,57 +138,34 @@ void lex(FILE *fp){
 		memset(word, 0, sizeof(word));
 		j = 0;
 		for(int i = 0; buf[i] != 0; i++){
-			switch(buf[i]){
-				case ' ':
-					currentToken = checksToken(word, currentToken);
-					memset(word, 0, sizeof(word));
-					j = 0;
-					break;
-				case ';':
-					currentToken = checksToken(word, currentToken);
-					memset(word, 0, sizeof(word));
-					j = 0;
-					currentToken = checksToken(";", currentToken);
-					break;
-				case '(':
-					currentToken = checksToken(word, currentToken);
-					memset(word, 0, sizeof(word));
-					j = 0;
-					currentToken = checksToken("(", currentToken);
-					break;
-				case ')':
-					currentToken = checksToken(word, currentToken);
-					memset(word, 0, sizeof(word));
-					j = 0;
-					currentToken = checksToken(")", currentToken);
-					break;
-				case '{':
-					currentToken = checksToken(word, currentToken);
-					memset(word, 0, sizeof(word));
-					j = 0;
-					currentToken = checksToken("{", currentToken);
-					break;
-				case '}':
-					currentToken = checksToken(word, currentToken);
-					memset(word, 0, sizeof(word));
-					j = 0;
-					currentToken = checksToken("}", currentToken);
-					break;
-				case '[':
-					currentToken = checksToken(word, currentToken);
-					memset(word, 0, sizeof(word));
-					j = 0;
-					currentToken = checksToken("[", currentToken);
-					break;
-				case ']':
-					currentToken = checksToken(word, currentToken);
-					memset(word, 0, sizeof(word));
-					j = 0;
-					currentToken = checksToken("]", currentToken);
-					break;
-				case '"':
-					break;
-			}
+			if(buf[i] != '"'){
+				currentToken = checksToken(word, currentToken);
+				memset(word, 0, sizeof(word));
+				j=0;
+				switch(buf[i]){
+					case ' ':
+						break;
+					case ';':
+						currentToken = checksToken(";", currentToken);
+						break;
+					case '(':
+						currentToken = checksToken("(", currentToken);
+						break;
+					case ')':
+						currentToken = checksToken(")", currentToken);
+						break;
+					case '{':
+						currentToken = checksToken("{", currentToken);
+						break;
+					case '}':
+						currentToken = checksToken("}", currentToken);
+						break;
+					case '[':
+						currentToken = checksToken("[", currentToken);
+						break;
+					case ']':
+						currentToken = checksToken("]", currentToken);
+				}
 
 			if(!isspace(buf[i]) && buf[i] != '(' && buf[i] != ')' 
 				&& buf[i] != '{' && buf[i] != '}' && buf[i] != '[' 
