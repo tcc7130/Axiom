@@ -5,9 +5,68 @@
 #include "syntax.c"
 
 struct token *checksToken(char *word, struct token *tok){
-	//printf("%i\n",COMA);
+	int decimal = 0;
+	
 	if(!strcmp(word, "int") || !strcmp(word, "double") || !strcmp(word, "char") || !strcmp(word, "str")){
 		return createToken(VARIABLE_TYPE, word, tok);
+	}
+	else if (isdigit(word[0])) {	
+		for (int i = 1; i < strlen(word); i++)
+		{
+			if (!(isdigit(word[i]) || word[i] == 46)) {
+				tok->next = malloc(sizeof(struct token));
+					tok = tok->next;
+					tok->id = -1;
+					tok->content = malloc(sizeof(word));
+					strcpy(tok->content, word);
+					tok->next = NULL;
+					printf("Undefined token: %s\n", tok->content);
+					return tok;
+			}
+			if (word[i] == 46) {
+				decimal++;
+			}
+		}
+		if (decimal == 0) {
+			tok->next = malloc(sizeof(struct token));
+			tok = tok->next;
+			tok->id = 3;
+			tok->content = malloc(sizeof(word));
+			strcpy(tok->content, word);
+			tok->next = NULL;
+			printf("Found token: %s\n", tok->content);
+			return tok;
+		}
+		else if (decimal == 1) {
+			if (word[strlen(word) - 1] == 46) {
+				tok->next = malloc(sizeof(struct token));
+				tok = tok->next;
+				tok->id = -1;
+				tok->content = malloc(sizeof(word));
+				strcpy(tok->content, word);
+				tok->next = NULL;
+				printf("Undefined token: %s\n", tok->content);
+				return tok;
+			}
+			tok->next = malloc(sizeof(struct token));
+			tok = tok->next;
+			tok->id = -1;
+			tok->content = malloc(sizeof(word));
+			strcpy(tok->content, word);
+			tok->next = NULL;
+			printf("Undefined token: %s\n", tok->content);
+			return tok; 
+		}
+		else {
+			tok->next = malloc(sizeof(struct token));
+			tok = tok->next;
+			tok->id = 3;
+			tok->content = malloc(sizeof(word));
+			strcpy(tok->content, word);
+			tok->next = NULL;
+			printf("Found token: %s\n", tok->content);
+			return tok;
+		}
 	}
 	else if(!strcmp(word, ";")){
 		return createToken(SEMICOLON, word, tok);
