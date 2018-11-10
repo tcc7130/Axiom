@@ -1,6 +1,6 @@
-string nom[10];
-double pro[10];
-int mat[10];
+string nom[10.0];
+double pro[10.];
+int mat[10.0.0];
 
 for(int i=0; i<10; i++) {
 	read(nom[i], pro[i], mat[i]);
