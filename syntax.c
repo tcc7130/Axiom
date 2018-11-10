@@ -1,5 +1,5 @@
 struct token *Expression(struct token *tk){
-			printf("%s\n", tk->id);
+			printf("%i\n", tk->id);
 	if(tk->id == KEYWORD_IF){
 		printf("%s\n", tk->content);
 		tk = Condition(tk);
@@ -36,7 +36,7 @@ struct token *Condition(struct token *tk){
 					printf("%s\n", tk->content);
 			tk = tk->next;
 			//AQUI FALTAN LAS VARIABLES
-			if(tk->id == VARIABLE_NAME || Variable(tk)){
+			if(tk->id == VARIABLE_NAME){
 						printf("%s\n", tk->content);
 				tk = tk->next;
 				if(tk->id == PAREN_R){
@@ -57,7 +57,7 @@ struct token *Condition(struct token *tk){
 	return tk;
 }
 struct token *Variable(struct token *tk){
-	if(Number(tk))
+	return NULL;
 }
 struct token *Declare(struct token *tk){
 	return NULL;
