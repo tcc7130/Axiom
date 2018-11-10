@@ -1,92 +1,282 @@
 #include <stdio.h>
-#include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
-#define MAX_LENGTH 255
+#include "axiom.h"
 
-struct Token {
-	char *name;
-	char *value;
-};
-
-struct Token check (char c){
-	struct Token t;
-	t.name = (char *) malloc (20);
-	t.value = (char *) malloc (20);
-	switch(c){
-		case ';':
-			strcpy(t.name, "Semicolon");
-			strcpy(t.value, ";");
-			break;
-		case '"':
-			strcpy(t.name, "Comilla_Dob");
-			strcpy(t.value, "\"");
-			break;
-		case '\'':
-			strcpy(t.name, "Comilla_Sin");
-			strcpy(t.value, "'");
-			break;
-		case ',':
-			strcpy(t.name, "Coma");
-			strcpy(t.value, ",");
-			break;
-		case '(':
-			strcpy(t.name, "Paren_L");
-			strcpy(t.value, "(");
-			break;
-		case ')':
-			strcpy(t.name, "Paren_R");
-			strcpy(t.value, ")");
-			break;
-		case '[':
-			strcpy(t.name, "Corchete_L");
-			strcpy(t.value, "[");
-			break;
-		case ']':
-			strcpy(t.name, "Corchete_R");
-			strcpy(t.value, "]");
-			break;
-		case '{':
-			strcpy(t.name, "Llave_L");
-			strcpy(t.value, "{");
-			break;	
-		case '}':
-			strcpy(t.name, "LLave_R");
-			strcpy(t.value, "}");
+int endsToken(char c){
+	if(c == ' ' || c == ';' || c == '(' || c == ')' || c == '{' || c == '}'){
+		printf("Si es final del token\n");
+		return 1;
 	}
-	
-	return t;
+	return (c == ' ' || c == ';' || c == '(' || c == ')' || c == '{' || c == '}');
 }
 
-void lex(FILE *fp){
-	struct Token *tokens;
-	tokens = (struct Token *) malloc (MAX_LENGTH);
-	char *token;
-	int c;
-	size_t n = 0;
-        token = (char *) malloc (MAX_LENGTH);
+struct token *checksToken(char *word, struct token *tok){
+	//printf("%s\n",word);
+	int decimal = 0;
+	if(!strcmp(word, "int") || !strcmp(word, "double") || !strcmp(word, "char") || !strcmp(word, "str")){
 		
-   	if(fp!=NULL){
-		while((c = fgetc(fp)) != EOF){
-			if(isspace(c)==0){
-				tokens[n] = (struct Token) check(c);
-				printf("%s\t\t%s\n", tokens[n].name, tokens[n].value);
-				n++;
-			}	
+		return createToken(VARIABLE_TYPE, word, tok);
+	}
+	else if (isdigit(word[0])) {
+		
+		
+		for (int i = 1; i < strlen(word); i++)
+		{
+			if (!(isdigit(word[i]) || word[i] == 46)) {
+				tok->next = malloc(sizeof(struct token));
+					tok = tok->next;
+					tok->id = -1;
+					tok->content = malloc(sizeof(word));
+					strcpy(tok->content, word);
+					tok->next = NULL;
+					printf("Undefined token: %s\n", tok->content);
+					return tok;
+			}
+			if (word[i] == 46) {
+				decimal++;
+			}
 		}
-		token[n] = 0;
-    	}	
+		if (decimal == 0) {
+			tok->next = malloc(sizeof(struct token));
+			tok = tok->next;
+			tok->id = 3;
+			tok->content = malloc(sizeof(word));
+			strcpy(tok->content, word);
+			tok->next = NULL;
+			printf("Found token: %s\n", tok->content);
+			return tok;
+		}
+		else if (decimal == 1) {
+			if (word[strlen(word) - 1] == 46) {
+				tok->next = malloc(sizeof(struct token));
+				tok = tok->next;
+				tok->id = -1;
+				tok->content = malloc(sizeof(word));
+				strcpy(tok->content, word);
+				tok->next = NULL;
+				printf("Undefined token: %s\n", tok->content);
+				return tok;
+			}
+			tok->next = malloc(sizeof(struct token));
+			tok = tok->next;
+			tok->id = -1;
+			tok->content = malloc(sizeof(word));
+			strcpy(tok->content, word);
+			tok->next = NULL;
+			printf("Undefined token: %s\n", tok->content);
+			return tok; 
+		}
+		else {
+			tok->next = malloc(sizeof(struct token));
+			tok = tok->next;
+			tok->id = 3;
+			tok->content = malloc(sizeof(word));
+			strcpy(tok->content, word);
+			tok->next = NULL;
+			printf("Found token: %s\n", tok->content);
+			return tok;
+		}
+	}
+	else if(!strcmp(word, ";")){
+		return createToken(22, word, tok);
+	}
+	else if(!strcmp(word, "(")){
+		tok->next = malloc(sizeof(struct token));
+		tok = tok->next;
+		tok->id = 3;
+		tok->content = malloc(sizeof(word));
+		strcpy(tok->content, word);
+		tok->next = NULL;
+		printf("Found token: %s\n", tok->content);			
+		return tok;
+	}
+	else if(!strcmp(word, ")")){
+		tok->next = malloc(sizeof(struct token));
+		tok = tok->next;
+		tok->id = 3;
+		tok->content = malloc(sizeof(word));
+		strcpy(tok->content, word);
+		tok->next = NULL;
+		printf("Found token: %s\n", tok->content);			
+		return tok;
+	}
+	else if(!strcmp(word, "{")){
+		tok->next = malloc(sizeof(struct token));
+		tok = tok->next;
+		tok->id = 3;
+		tok->content = malloc(sizeof(word));
+		strcpy(tok->content, word);
+		tok->next = NULL;
+		printf("Found token: %s\n", tok->content);			
+		return tok;
+	}
+	else if(!strcmp(word, "}")){
+		tok->next = malloc(sizeof(struct token));
+		tok = tok->next;
+		tok->id = 3;
+		tok->content = malloc(sizeof(word));
+		strcpy(tok->content, word);
+		tok->next = NULL;
+		printf("Found token: %s\n", tok->content);			
+		return tok;
+	}
+	else if(!strcmp(word, "[")){
+		tok->next = malloc(sizeof(struct token));
+		tok = tok->next;
+		tok->id = 3;
+		tok->content = malloc(sizeof(word));
+		strcpy(tok->content, word);
+		tok->next = NULL;
+		printf("Found token: %s\n", tok->content);			
+		return tok;
+	}
+	else if(!strcmp(word, "]")){
+		tok->next = malloc(sizeof(struct token));
+		tok = tok->next;
+		tok->id = 3;
+		tok->content = malloc(sizeof(word));
+		strcpy(tok->content, word);
+		tok->next = NULL;
+		printf("Found token: %s\n", tok->content);			
+		return tok;
+	}
+	else{
+		if(strlen(word) > 0){
+			tok->next = malloc(sizeof(struct token));
+			tok = tok->next;
+			tok->id = -1;
+			tok->content = malloc(sizeof(word));
+			strcpy(tok->content, word);
+			tok->next = NULL;
+			printf("Undefined token: %s\n", tok->content);
+			return tok;
+		}
+		else
+			return tok;
+	}
+	return NULL;
 }
 
-int main(int argc, char *args[]){
-	if(!args[1]){
+struct token *createToken(int id, char *word, struct token *tok){
+	tok->next = malloc(sizeof(struct token));
+	tok = tok->next;
+	tok->id = id;
+	tok->content = malloc(sizeof(word));
+	strcpy(tok->content, word);
+	tok->next = NULL;
+	printf("Found token: %s\n", tok->content);
+	return tok;
+}
+
+void lex(FILE *fp) {
+	struct tokenList *lists = NULL;
+	lists = malloc(sizeof(struct tokenList));
+
+	struct token *head;
+	head = malloc(sizeof(struct token));
+	head->id = 0;
+	head->content = "START";
+	head->next = NULL;
+
+	struct token *temp;
+	struct token *currentToken;
+	currentToken = head;
+
+	char c;
+	char *buf = "";
+	char *tok = "";
+	//char *comp ;
+	//comp = malloc(255);
+
+	char word[64] = "";
+	char *word2 = "";
+
+	int j;
+	int isString = 0;
+	while (fgets(buf, 255, fp)) {
+		//printf("\nbuf: %s\n", buf);
+		memset(word, 0, sizeof(word));
+		j = 0;
+		for (int i = 0; buf[i] != 0; i++) {
+			
+			switch (buf[i]) {
+			case ' ':
+				currentToken = checksToken(word, currentToken);
+				memset(word, 0, sizeof(word));
+				j = 0;
+				break;
+			case ';':
+				currentToken = checksToken(word, currentToken);
+				memset(word, 0, sizeof(word));
+				j = 0;
+				currentToken = checksToken(";", currentToken);
+				break;
+			case '(':
+				currentToken = checksToken(word, currentToken);
+				memset(word, 0, sizeof(word));
+				j = 0;
+				currentToken = checksToken("(", currentToken);
+				break;
+			case ')':
+				currentToken = checksToken(word, currentToken);
+				memset(word, 0, sizeof(word));
+				j = 0;
+				currentToken = checksToken(")", currentToken);
+				break;
+			case '{':
+				currentToken = checksToken(word, currentToken);
+				memset(word, 0, sizeof(word));
+				j = 0;
+				currentToken = checksToken("{", currentToken);
+				break;
+			case '}':
+				currentToken = checksToken(word, currentToken);
+				memset(word, 0, sizeof(word));
+				j = 0;
+				currentToken = checksToken("}", currentToken);
+				break;
+			case '[':
+				currentToken = checksToken(word, currentToken);
+				memset(word, 0, sizeof(word));
+				j = 0;
+				currentToken = checksToken("[", currentToken);
+				break;
+			case ']':
+				currentToken = checksToken(word, currentToken);
+				memset(word, 0, sizeof(word));
+				j = 0;
+				currentToken = checksToken("]", currentToken);
+				break;
+			case '"':
+				break;
+			}
+
+			if (!isspace(buf[i]) && buf[i] != '(' && buf[i] != ')'
+				&& buf[i] != '{' && buf[i] != '}' && buf[i] != '['
+				&& buf[i] != ']' && buf[i] != ';' && buf[i] != ',') {
+				word[j] = buf[i];
+				j++;
+			}
+		}
+	}
+
+	printf("LIST:\n");
+	while (head) {
+		printf("FINAL: %s\n", head->content);
+		head = head->next;
+	}
+}
+
+int main(int argc, char *args[]) {
+	if (!args[1]) {
 		printf("Needs more arguments\n");
 		return 1;
 	}
 
 	FILE *fp = fopen(args[1], "r");
 
-	if(!fp){
+	if (!fp) {
 		printf("Could not open file: %s\n", args[1]);
 		return 1;
 	}
