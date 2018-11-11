@@ -54,7 +54,7 @@ struct token *checksToken(char *word, struct token *tok){
 			tok->content = malloc(sizeof(word));
 			strcpy(tok->content, word);
 			tok->next = NULL;
-			printf("Undefined token: %s\n", tok->content);
+			printf("Found token: %s\n", tok->content);
 			return tok; 
 		}
 		else {
@@ -64,7 +64,7 @@ struct token *checksToken(char *word, struct token *tok){
 			tok->content = malloc(sizeof(word));
 			strcpy(tok->content, word);
 			tok->next = NULL;
-			printf("Found token: %s\n", tok->content);
+			printf("Undefined token: %s\n", tok->content);
 			return tok;
 		}
 	}
