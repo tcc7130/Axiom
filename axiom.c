@@ -28,14 +28,7 @@ struct token *checksToken(char *word, struct token *tok){
 			}
 		}
 		if (decimal == 0) {
-			tok->next = malloc(sizeof(struct token));
-			tok = tok->next;
-			tok->id = 3;
-			tok->content = malloc(sizeof(word));
-			strcpy(tok->content, word);
-			tok->next = NULL;
-			printf("Found token: %s\n", tok->content);
-			return tok;
+			return createToken(INTEGER, word, tok);
 		}
 		else if (decimal == 1) {
 			if (word[strlen(word) - 1] == 46) {
@@ -45,17 +38,10 @@ struct token *checksToken(char *word, struct token *tok){
 				tok->content = malloc(sizeof(word));
 				strcpy(tok->content, word);
 				tok->next = NULL;
-				printf("Undefined token: %s\n", tok->content);
+				printf("Point at end: %s\n", tok->content);
 				return tok;
 			}
-			tok->next = malloc(sizeof(struct token));
-			tok = tok->next;
-			tok->id = -1;
-			tok->content = malloc(sizeof(word));
-			strcpy(tok->content, word);
-			tok->next = NULL;
-			printf("Found token: %s\n", tok->content);
-			return tok; 
+			return createToken(DECIMAL, word, tok);
 		}
 		else {
 			tok->next = malloc(sizeof(struct token));
@@ -64,7 +50,7 @@ struct token *checksToken(char *word, struct token *tok){
 			tok->content = malloc(sizeof(word));
 			strcpy(tok->content, word);
 			tok->next = NULL;
-			printf("Undefined token: %s\n", tok->content);
+			printf("More than one point: %s\n", tok->content);
 			return tok;
 		}
 	}
@@ -75,54 +61,43 @@ struct token *checksToken(char *word, struct token *tok){
 		return createToken(PAREN_L, word, tok);
 	}
 	else if(!strcmp(word, ")")){
-		tok->next = malloc(sizeof(struct token));
-		tok = tok->next;
-		tok->id = 3;
-		tok->content = malloc(sizeof(word));
-		strcpy(tok->content, word);
-		tok->next = NULL;
-		printf("Found token: %s\n", tok->content);			
-		return tok;
+		return createToken(PAREN_R, word, tok);		
 	}
 	else if(!strcmp(word, "{")){
-		tok->next = malloc(sizeof(struct token));
-		tok = tok->next;
-		tok->id = 3;
-		tok->content = malloc(sizeof(word));
-		strcpy(tok->content, word);
-		tok->next = NULL;
-		printf("Found token: %s\n", tok->content);			
-		return tok;
+		return createToken(LLAVE_L, word, tok);
 	}
 	else if(!strcmp(word, "}")){
-		tok->next = malloc(sizeof(struct token));
-		tok = tok->next;
-		tok->id = 3;
-		tok->content = malloc(sizeof(word));
-		strcpy(tok->content, word);
-		tok->next = NULL;
-		printf("Found token: %s\n", tok->content);			
-		return tok;
+		return createToken(LLAVE_R, word, tok);
 	}
 	else if(!strcmp(word, "[")){
-		tok->next = malloc(sizeof(struct token));
-		tok = tok->next;
-		tok->id = 3;
-		tok->content = malloc(sizeof(word));
-		strcpy(tok->content, word);
-		tok->next = NULL;
-		printf("Found token: %s\n", tok->content);			
-		return tok;
+		return createToken(CORCHETE_L, word, tok);
 	}
 	else if(!strcmp(word, "]")){
-		tok->next = malloc(sizeof(struct token));
-		tok = tok->next;
-		tok->id = 3;
-		tok->content = malloc(sizeof(word));
-		strcpy(tok->content, word);
-		tok->next = NULL;
-		printf("Found token: %s\n", tok->content);			
-		return tok;
+		return createToken(CORCHETE_R, word, tok);
+	}
+	else if(!strcmp(word, "while")){
+		return createToken(KEYWORD_WHILE, word, tok);
+	}
+	else if(!strcmp(word, "for")){
+		return createToken(KEYWORD_FOR, word, tok);
+	}
+	else if(!strcmp(word, "if")){
+		return createToken(KEYWORD_IF, word, tok);
+	}
+	else if(!strcmp(word, "else")){
+		return createToken(KEYWORD_ELSE, word, tok);
+	}
+	else if(!strcmp(word, "elif")){
+		return createToken(KEYWORD_ELIF, word, tok);
+	}
+	else if(!strcmp(word, "read")){
+		return createToken(KEYWORD_READ, word, tok);
+	}
+	else if(!strcmp(word, "print")){
+		return createToken(KEYWORD_READ, word, tok);
+	}
+	else if(!strcmp(word, "println")){
+		return createToken(KEYWORD_READ, word, tok);
 	}
 	else if(isalpha(word[0])){
 		for(int i = 1; i < strlen(word); i++){
@@ -138,7 +113,7 @@ struct token *checksToken(char *word, struct token *tok){
 				return tok;
 			}
 		}
-		return createToken(0, word, tok);
+		return createToken(VARIABLE_NAME, word, tok);
 	}
 	else if(strlen(word) > 0){
 		tok->next = malloc(sizeof(struct token));
