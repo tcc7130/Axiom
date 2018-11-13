@@ -151,7 +151,7 @@ struct token *createToken(int id, char *word, struct token *tok){
 	tok->content = malloc(sizeof(word));
 	strcpy(tok->content, word);
 	tok->next = NULL;
-	printf("Found token: %s\n", tok->content);
+	id != -1 ? printf("Found token: %s\n", tok->content) : printf("Undefined token: %s\n", tok->content); 
 	//tok->papa = -1;
 	return tok;
 }
@@ -243,7 +243,13 @@ struct tokenList *lex(FILE *fp){
 						currentToken = checksToken(word, currentToken);
 						memset(word, 0, sizeof(word));
 						j = 0;
-						isString = 1 - isString;
+						isString = 1;
+						break;
+					case '\'':
+						currentToken = checksToken(word, currentToken);
+						memset(word, 0, sizeof(word));
+						j = 0;
+						isString = 2;
 						break;
 					case '>':
 						currentToken = checksToken(word, currentToken);
@@ -325,11 +331,25 @@ struct tokenList *lex(FILE *fp){
 			else{
 				word[j] = buf[i];
 				j++;
-				if(buf[i] == '"'){
+				if(isString == 1 && buf[i] == '"'){
 					currentToken = createToken(27, word, currentToken);
 					memset(word, 0, sizeof(word));
 					j = 0;
 					isString = 1 - isString;
+				}
+				else if(isString == 2 && buf[i] == '\''){
+					if(strlen(word) == 3){
+						currentToken = createToken(KCHAR, word, currentToken);
+						memset(word, 0, sizeof(word));
+						j = 0;
+						isString = 0;
+					}
+					else{
+						currentToken = createToken(-1, word, currentToken);
+						memset(word, 0, sizeof(word));
+						j = 0;
+						isString = 0;
+					}
 				}
 			}		
 		}
