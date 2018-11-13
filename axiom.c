@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -366,7 +365,6 @@ int main(int argc, char *args[]){
 
 	struct tokenList *tl = lex(fp);
 }
-=======
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -756,4 +754,3 @@ int main(int argc, char *args[]){
 	struct tokenList *tl = lex(fp);
 	syntax(tl);
 }
->>>>>>> 01042c508bf5065ae60b25224441a91182d11773
