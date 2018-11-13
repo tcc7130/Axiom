@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>  
 #include "axiom.h"
 #include "syntax.c"
+#include "convertToPostfix.c"
 
 struct token *checksToken(char *word, struct token *tok){
 	int decimal = 0;
@@ -28,7 +30,8 @@ struct token *checksToken(char *word, struct token *tok){
 			}
 		}
 		if (decimal == 0) {
-			return createToken(INTEGER, word, tok, OPERAND);
+			return createToken(INTEGER, word, tok);
+			//return createToken(INTEGER, word, tok, OPERAND);
 		}
 		else if (decimal == 1) {
 			if (word[strlen(word) - 1] == 46) {
@@ -41,7 +44,8 @@ struct token *checksToken(char *word, struct token *tok){
 				printf("Point at end: %s\n", tok->content);
 				return tok;
 			}
-			return createToken(DECIMAL, word, tok, OPERAND);
+			return createToken(DECIMAL, word, tok);
+			//return createToken(DECIMAL, word, tok, OPERAND);
 		}
 		else {
 			tok->next = malloc(sizeof(struct token));
