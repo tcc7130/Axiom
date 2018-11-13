@@ -13,7 +13,7 @@ struct tokenList{
 
 int endsToken(char c);
 struct token *checksToken(char *word, struct token *tok);
-struct token *createToken(int id, char *word, struct token *tok, int papa);
+//struct token *createToken(int id, char *word, struct token *tok, int papa);
 struct token *createToken(int id, char *word, struct token *tok);
 struct tokenList *lex(FILE *fp);
 void syntax(struct tokenList *tokens);
