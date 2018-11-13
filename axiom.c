@@ -133,17 +133,17 @@ struct token *checksToken(char *word, struct token *tok){
 		return tok;
 }
 
-struct token *createToken(int id, char *word, struct token *tok, int papa){
-	tok->next = malloc(sizeof(struct token));
-	tok = tok->next;
-	tok->id = id;
-	tok->content = malloc(sizeof(word));
-	strcpy(tok->content, word);
-	tok->next = NULL;
-	printf("Found token: %s\n", tok->content);
-	tok->papa = papa;
-	return tok;
-}
+// struct token *createToken(int id, char *word, struct token *tok, int papa){
+// 	tok->next = malloc(sizeof(struct token));
+// 	tok = tok->next;
+// 	tok->id = id;
+// 	tok->content = malloc(sizeof(word));
+// 	strcpy(tok->content, word);
+// 	tok->next = NULL;
+// 	printf("Found token: %s\n", tok->content);
+// 	tok->papa = papa;
+// 	return tok;
+// }
 struct token *createToken(int id, char *word, struct token *tok){
 	tok->next = malloc(sizeof(struct token));
 	tok = tok->next;
