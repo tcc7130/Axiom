@@ -34,7 +34,6 @@ struct token *Condition(struct token *tk){
 		tk = tk->next;
 		if(tk->id == PAREN_L){
 			tk = tk->next;
-			//AQUI FALTAN LAS VARIABLES
 			if(tk->id == VARIABLE_NAME){
 				printf("3. %s\n", tk->content);
 				tk = tk->next;

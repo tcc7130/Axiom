@@ -17,10 +17,13 @@ struct token *checksToken(char *word, struct token *tok);
 //struct token *createToken(int id, char *word, struct token *tok, int papa);
 struct token *createToken(int id, char *word, struct token *tok);
 struct tokenList *lex(FILE *fp);
-//void syntax(struct tokenList *tokens);
+void syntax(struct tokenList *tokens);
 
 struct token *Expression(struct token *tk);
 struct token *Condition(struct token *tk);
+struct token *Variable(struct token *tk);
+struct token *Comparison(struct token *tk);
+struct token *Operation(struct token *tk);
 struct token *Declare(struct token *tk);
 struct token *Assign(struct token *tk);
 struct token *Loop_While(struct token *tk);

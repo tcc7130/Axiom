@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <ctype.h>  
 #include "axiom.h"
-//#include "syntax.c"
+#include "syntax.c"
 //#include "convertToPostfix.c"
 
 struct token *checksToken(char *word, struct token *tok){
@@ -343,13 +343,13 @@ struct tokenList *lex(FILE *fp){
     return lists;
 }
 
-// void syntax(struct tokenList *lists){
-// 	//printf("%i\n", lists->start->id);
-// 	struct token *tk;
-// 	tk = lists->start;
-// 	tk = tk->next;
-// 	Expression(tk);
-// }
+void syntax(struct tokenList *lists){
+	//printf("%i\n", lists->start->id);
+	struct token *tk;
+	tk = lists->start;
+	tk = tk->next;
+	Expression(tk);
+}
 
 int main(int argc, char *args[]){
 	if(!args[1]){
@@ -365,5 +365,5 @@ int main(int argc, char *args[]){
 	}
 
 	struct tokenList *tl = lex(fp);
-	//syntax(tl);
+	syntax(tl);
 }
