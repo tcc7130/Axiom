@@ -4,7 +4,7 @@
 #include <ctype.h>  
 #include "axiom.h"
 #include "syntax.c"
-#include "convertToPostfix.c"
+//#include "convertToPostfix.c"
 
 struct token *checksToken(char *word, struct token *tok){
 	int decimal = 0;
