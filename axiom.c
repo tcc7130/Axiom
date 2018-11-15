@@ -151,7 +151,6 @@ struct token *createToken(int id, char *word, struct token *tok){
 	strcpy(tok->content, word);
 	tok->next = NULL;
 	printf("Found token: %s\n", tok->content);
-	tok->papa = -1;
 	return tok;
 }
 
