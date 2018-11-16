@@ -44,7 +44,6 @@ struct token *Condition(struct token *tk){
 							if(temp!=NULL) tk = temp;
 						}while(temp != NULL);
 						if(tk->id == LLAVE_R){
-							printf("%s\n", tk->content);
 							printf("NICE\n");
 							return tk->next;
 						}
@@ -59,10 +58,13 @@ struct token *Operation(struct token *tk){
 	return NULL;
 }
 struct token *Declare(struct token *tk){
+	struct token *temp;
 	if(tk->id == VARIABLE_TYPE){
 		tk = tk->next;
-		if(tk->id == VARIABLE_NAME){
-			tk = tk->next;
+		temp = ArrayVariable(tk);
+		if(temp != NULL) tk = temp;
+		if(temp != NULL || tk->id == VARIABLE_NAME){
+			if(temp == NULL) tk = tk->next;
 			if(tk->id == ASSIGN){
 				tk = Operand(tk->next);
 				if(tk == NULL)
@@ -71,8 +73,10 @@ struct token *Declare(struct token *tk){
 			while(1){
 				if(tk->id == COMA){
 					tk = tk->next;
-					if(tk->id == VARIABLE_NAME){
-						tk = tk->next;
+					temp = ArrayVariable(tk);
+					if(temp != NULL) tk = temp;
+					if(temp != NULL || tk->id == VARIABLE_NAME){
+						if(temp == NULL) tk = tk->next;
 						if(tk->id == ASSIGN){
 							tk = Operand(tk->next);
 							if(tk == NULL){
@@ -91,18 +95,18 @@ struct token *Declare(struct token *tk){
 	return NULL;
 }
 struct token *Assign(struct token *tk){
-	if(tk->id == VARIABLE_NAME){
-		tk = tk->next;
+	struct token *temp;
+	temp = ArrayVariable(tk);
+	if(temp != NULL) tk = temp;
+	if(temp != NULL || tk->id == VARIABLE_NAME){
+		if(temp == NULL) tk = tk->next;
 		if(tk->id == ASSIGN){
-			tk = tk->next;
-			if(tk->id == VARIABLE_NAME){
-				tk = tk->next;
+			tk = Operand(tk->next);
+			if(tk != NULL){
 				if(tk->id == INCREMENT || tk->id == DECREMENT){
 					return tk->next;
 				}
-			}
-			if(tk->id == 100000){//Falta checar que sea VARIABLE o VARIABLE_NAME
-				tk = tk->next;
+				else return tk;
 			}
 		}
 	}
@@ -116,17 +120,22 @@ struct token *Loop_For(struct token *tk){
 	return NULL;
 }
 struct token *Read(struct token *tk){
+	struct token *temp;
 	if(tk->id == KEYWORD_READ){
 		tk = tk->next;
 		if(tk->id == PAREN_L){
 			tk = tk->next;
-			if(tk->id == VARIABLE_NAME){
-				tk = tk->next;
+			temp = ArrayVariable(tk);
+			if(temp != NULL) tk=temp;
+			if(temp != NULL || tk->id == VARIABLE_NAME){
+				if(temp == NULL) tk = tk->next;
 				while(1){
 					if(tk->id == COMA){
 						tk = tk->next;
-						if(tk->id == VARIABLE_NAME){
-							tk = tk->next;
+						temp = ArrayVariable(tk);
+						if(temp != NULL) tk=temp;
+						if(temp != NULL || tk->id == VARIABLE_NAME){
+							if(temp == NULL) tk = tk->next;
 						}
 						else return NULL;
 					}
@@ -145,9 +154,9 @@ struct token *Write(struct token *tk){
 	if(tk->id == KEYWORD_PRINT || tk->id == KEYWORD_PRINTLN){
 		tk = tk->next;
 		if(tk->id == PAREN_L){
+			printf("...\n");
 			tk = Operand(tk->next);
 			if(tk != NULL){
-				tk = tk->next;
 				if(tk->id == PAREN_R){
 					return tk->next;
 				}
@@ -158,13 +167,18 @@ struct token *Write(struct token *tk){
 }
 struct token *Operand(struct token *tk){
 	printf("Starting to analyze Operand: %s\n", tk->content);
-	if(tk->id == VARIABLE_NAME || tk->id == INTEGER || tk->id == DECIMAL || tk->id == STRING || tk->id == KCHAR){
-		tk = tk->next;
+	struct token *temp;
+	temp = ArrayVariable(tk);
+	if(temp != NULL) tk = temp;
+	if(temp != NULL || tk->id == VARIABLE_NAME || tk->id == INTEGER || tk->id == DECIMAL || tk->id == STRING || tk->id == KCHAR){
+		if(temp == NULL) tk = tk->next;
 		while(1){
 			if(tk->id == ARITMETIC_OP || tk->id == COMPARE_OP){
 				tk = tk->next;
-				if(tk->id == VARIABLE_NAME || tk->id == INTEGER || tk->id == DECIMAL || tk->id == STRING || tk->id == KCHAR){
-					tk = tk->next;
+				temp = ArrayVariable(tk);
+				if(temp != NULL) tk = temp;
+				if(temp!= NULL || tk->id == VARIABLE_NAME || tk->id == INTEGER || tk->id == DECIMAL || tk->id == STRING || tk->id == KCHAR){
+					if(temp == NULL) tk = tk->next;
 				}
 				else if(tk->id == PAREN_L){
 					tk = Operand(tk->next);

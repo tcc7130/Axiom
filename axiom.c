@@ -94,10 +94,10 @@ struct token *checksToken(char *word, struct token *tok){
 		return createToken(KEYWORD_READ, word, tok);
 	}
 	else if(!strcmp(word, "print")){
-		return createToken(KEYWORD_READ, word, tok);
+		return createToken(KEYWORD_PRINT, word, tok);
 	}
 	else if(!strcmp(word, "println")){
-		return createToken(KEYWORD_READ, word, tok);
+		return createToken(KEYWORD_PRINTLN, word, tok);
 	}
 	else if(isalpha(word[0])){
 		for(int i = 1; i < strlen(word); i++){
