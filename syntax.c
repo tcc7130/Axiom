@@ -1,30 +1,33 @@
 struct token *Expression(struct token *tk){
 	printf("EXPRESSION START: %s\n", tk->content);
-	if(tk->id == KEYWORD_IF){
-		tk = Condition(tk);
+	switch(tk->id){
+		case KEYWORD_IF:
+			tk = Condition(tk);
+			break;	
+		case VARIABLE_TYPE:
+			tk = Declare(tk);
+			break;
+		case VARIABLE_NAME:
+			tk = Assign(tk);
+			break;
+		case KEYWORD_WHILE:
+			tk = Loop_While(tk);
+			break;
+		case KEYWORD_FOR:
+			tk = Loop_For(tk);
+			break;
+		case KEYWORD_READ:
+			tk = Read(tk);
+			break;
+		case KEYWORD_PRINT:
+			tk = Write(tk);
+			break;
+		case SEMICOLON:
+	 		printf("Omedetou\n");
+	 		break;
+		default:
+	 		return NULL;
 	}
-	else if(tk->id == VARIABLE_TYPE){
-		tk = Declare(tk);
-	}
-	else if(tk->id == VARIABLE_NAME){
-		tk = Assign(tk);
-	}
-	else if(tk->id == KEYWORD_WHILE){
-		tk = Loop_While(tk);
-	}
-	else if(tk->id == KEYWORD_FOR){
-		tk = Loop_For(tk);
-	}
-	else if(tk->id == KEYWORD_READ){
-		tk = Read(tk);
-	}
-	else if(tk->id == KEYWORD_PRINT){
-		tk = Write(tk);
-	}
-	if(tk->id == SEMICOLON){
-	 	printf("Omedetou\n");
-	}
-	return NULL;
 }
 
 struct token *Condition(struct token *tk){
@@ -152,9 +155,9 @@ struct token *Read(struct token *tk){
 			}
 		}
 	}
-
 	return NULL;
 }
+
 struct token *Write(struct token *tk){
 	if(tk->id == KEYWORD_PRINT || tk->id == KEYWORD_PRINTLN){
 		tk = tk->next;
