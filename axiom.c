@@ -5,9 +5,54 @@
 #include "syntax.c"
 
 struct token *checksToken(char *word, struct token *tok){
-	//printf("%i\n",COMA);
+	int decimal = 0;
+	
 	if(!strcmp(word, "int") || !strcmp(word, "double") || !strcmp(word, "char") || !strcmp(word, "str")){
 		return createToken(VARIABLE_TYPE, word, tok);
+	}
+	else if (isdigit(word[0])) {	
+		for (int i = 1; i < strlen(word); i++)
+		{
+			if (!(isdigit(word[i]) || word[i] == 46)) {
+				tok->next = malloc(sizeof(struct token));
+					tok = tok->next;
+					tok->id = -1;
+					tok->content = malloc(sizeof(word));
+					strcpy(tok->content, word);
+					tok->next = NULL;
+					printf("Undefined token: %s\n", tok->content);
+					return tok;
+			}
+			if (word[i] == 46) {
+				decimal++;
+			}
+		}
+		if (decimal == 0) {
+			return createToken(INTEGER, word, tok);
+		}
+		else if (decimal == 1) {
+			if (word[strlen(word) - 1] == 46) {
+				tok->next = malloc(sizeof(struct token));
+				tok = tok->next;
+				tok->id = -1;
+				tok->content = malloc(sizeof(word));
+				strcpy(tok->content, word);
+				tok->next = NULL;
+				printf("Point at end: %s\n", tok->content);
+				return tok;
+			}
+			return createToken(DECIMAL, word, tok);
+		}
+		else {
+			tok->next = malloc(sizeof(struct token));
+			tok = tok->next;
+			tok->id = 3;
+			tok->content = malloc(sizeof(word));
+			strcpy(tok->content, word);
+			tok->next = NULL;
+			printf("More than one point: %s\n", tok->content);
+			return tok;
+		}
 	}
 	else if(!strcmp(word, ";")){
 		return createToken(SEMICOLON, word, tok);
@@ -16,54 +61,43 @@ struct token *checksToken(char *word, struct token *tok){
 		return createToken(PAREN_L, word, tok);
 	}
 	else if(!strcmp(word, ")")){
-		tok->next = malloc(sizeof(struct token));
-		tok = tok->next;
-		tok->id = 3;
-		tok->content = malloc(sizeof(word));
-		strcpy(tok->content, word);
-		tok->next = NULL;
-		printf("Found token: %s\n", tok->content);			
-		return tok;
+		return createToken(PAREN_R, word, tok);		
 	}
 	else if(!strcmp(word, "{")){
-		tok->next = malloc(sizeof(struct token));
-		tok = tok->next;
-		tok->id = 3;
-		tok->content = malloc(sizeof(word));
-		strcpy(tok->content, word);
-		tok->next = NULL;
-		printf("Found token: %s\n", tok->content);			
-		return tok;
+		return createToken(LLAVE_L, word, tok);
 	}
 	else if(!strcmp(word, "}")){
-		tok->next = malloc(sizeof(struct token));
-		tok = tok->next;
-		tok->id = 3;
-		tok->content = malloc(sizeof(word));
-		strcpy(tok->content, word);
-		tok->next = NULL;
-		printf("Found token: %s\n", tok->content);			
-		return tok;
+		return createToken(LLAVE_R, word, tok);
 	}
 	else if(!strcmp(word, "[")){
-		tok->next = malloc(sizeof(struct token));
-		tok = tok->next;
-		tok->id = 3;
-		tok->content = malloc(sizeof(word));
-		strcpy(tok->content, word);
-		tok->next = NULL;
-		printf("Found token: %s\n", tok->content);			
-		return tok;
+		return createToken(CORCHETE_L, word, tok);
 	}
 	else if(!strcmp(word, "]")){
-		tok->next = malloc(sizeof(struct token));
-		tok = tok->next;
-		tok->id = 3;
-		tok->content = malloc(sizeof(word));
-		strcpy(tok->content, word);
-		tok->next = NULL;
-		printf("Found token: %s\n", tok->content);			
-		return tok;
+		return createToken(CORCHETE_R, word, tok);
+	}
+	else if(!strcmp(word, "while")){
+		return createToken(KEYWORD_WHILE, word, tok);
+	}
+	else if(!strcmp(word, "for")){
+		return createToken(KEYWORD_FOR, word, tok);
+	}
+	else if(!strcmp(word, "if")){
+		return createToken(KEYWORD_IF, word, tok);
+	}
+	else if(!strcmp(word, "else")){
+		return createToken(KEYWORD_ELSE, word, tok);
+	}
+	else if(!strcmp(word, "elif")){
+		return createToken(KEYWORD_ELIF, word, tok);
+	}
+	else if(!strcmp(word, "read")){
+		return createToken(KEYWORD_READ, word, tok);
+	}
+	else if(!strcmp(word, "print")){
+		return createToken(KEYWORD_READ, word, tok);
+	}
+	else if(!strcmp(word, "println")){
+		return createToken(KEYWORD_READ, word, tok);
 	}
 	else if(isalpha(word[0])){
 		for(int i = 1; i < strlen(word); i++){
@@ -79,7 +113,7 @@ struct token *checksToken(char *word, struct token *tok){
 				return tok;
 			}
 		}
-		return createToken(0, word, tok);
+		return createToken(VARIABLE_NAME, word, tok);
 	}
 	else if(strlen(word) > 0){
 		tok->next = malloc(sizeof(struct token));
@@ -102,8 +136,9 @@ struct token *createToken(int id, char *word, struct token *tok){
 	tok->content = malloc(sizeof(word));
 	strcpy(tok->content, word);
 	tok->next = NULL;
-	printf("Found token: %s\n", tok->content);
-	return tok;
+	//printf("Found token: %s\n", tok->content);
+	id != -1 ? printf("Found token: %s\n", tok->content) : printf("Undefined token: %s\n", tok->content); 
+	return tok; 
 }
 
 struct tokenList *lex(FILE *fp){
@@ -153,6 +188,12 @@ struct tokenList *lex(FILE *fp){
 						j = 0;
 						currentToken = checksToken(";", currentToken);
 						break;
+					case ',':
+						currentToken = checksToken(word, currentToken);
+						memset(word, 0, sizeof(word));
+						j = 0;
+						currentToken = createToken(COMA, ",", currentToken);
+						break;
 					case '(':
 						currentToken = checksToken(word, currentToken);
 						memset(word, 0, sizeof(word));
@@ -193,7 +234,13 @@ struct tokenList *lex(FILE *fp){
 						currentToken = checksToken(word, currentToken);
 						memset(word, 0, sizeof(word));
 						j = 0;
-						isString = 1 - isString;
+						isString = 1;
+						break;
+					case '\'':
+						currentToken = checksToken(word, currentToken);
+						memset(word, 0, sizeof(word));
+						j = 0;
+						isString = 2;
 						break;
 					case '>':
 						currentToken = checksToken(word, currentToken);
@@ -261,13 +308,26 @@ struct tokenList *lex(FILE *fp){
 						else
 							currentToken = createToken(ARITMETIC_OP, "-", currentToken);
 						break;
+					case '*':
+						currentToken = checksToken(word, currentToken);
+						memset(word, 0, sizeof(word));
+						j = 0;
+						currentToken = createToken(ARITMETIC_OP, "*", currentToken);
+						break;
+					case '/':
+						currentToken = checksToken(word, currentToken);
+						memset(word, 0, sizeof(word));
+						j = 0;
+						currentToken = createToken(ARITMETIC_OP, "/", currentToken);
+						break;
 				}
 
 				if(!isspace(buf[i]) && buf[i] != '(' && buf[i] != ')' 
 				&& buf[i] != '{' && buf[i] != '}' && buf[i] != '[' 
 				&& buf[i] != ']' && buf[i] != ';' && buf[i] != ','
 				&& buf[i] != '>' && buf[i] != '<' && buf[i] != '='
-				&& buf[i] != '!' && buf[i] != '-' && buf[i] != '+'){
+				&& buf[i] != '!' && buf[i] != '-' && buf[i] != '+'
+				&& buf[i] != '/' && buf[i] != '*'){
 					word[j] = buf[i];
 					j++;
 				}
@@ -275,11 +335,25 @@ struct tokenList *lex(FILE *fp){
 			else{
 				word[j] = buf[i];
 				j++;
-				if(buf[i] == '"'){
-					currentToken = createToken(27, word, currentToken);
+				if(isString == 1 && buf[i] == '"'){
+					currentToken = createToken(STRING, word, currentToken);
 					memset(word, 0, sizeof(word));
 					j = 0;
-					isString = 1 - isString;
+					isString = 0;
+				}
+				else if(isString == 2 && buf[i] == '\''){
+					if(strlen(word) == 3){
+						currentToken = createToken(KCHAR, word, currentToken);
+						memset(word, 0, sizeof(word));
+						j = 0;
+						isString = 0;
+					}
+					else{
+						currentToken = createToken(-1, word, currentToken);
+						memset(word, 0, sizeof(word));
+						j = 0;
+						isString = 0;
+					}
 				}
 			}		
 		}
@@ -287,7 +361,7 @@ struct tokenList *lex(FILE *fp){
 
 	printf("LIST:\n");
     while(head){
-    	printf("FINAL: %s\n", head->content);
+    	printf("ID: %i, CONTENT: %s\n", head->id, head->content);
     	head = head->next;
     }
     return lists;
@@ -298,7 +372,7 @@ void syntax(struct tokenList *lists){
 	struct token *tk;
 	tk = lists->start;
 	tk = tk->next;
-	Expression(tk);
+	Operand(tk);
 }
 
 int main(int argc, char *args[]){
