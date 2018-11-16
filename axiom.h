@@ -20,8 +20,6 @@ void syntax(struct tokenList *tokens);
 
 struct token *Expression(struct token *tk);
 struct token *Condition(struct token *tk);
-struct token *Variable(struct token *tk);
-struct token *Comparison(struct token *tk);
 struct token *Operation(struct token *tk);
 struct token *Declare(struct token *tk);
 struct token *Assign(struct token *tk);
@@ -30,3 +28,5 @@ struct token *Loop_For(struct token *tk);
 struct token *Read(struct token *tk);
 struct token *Write(struct token *tk);
 struct token *Operand(struct token *tk);
+struct token *OperandInt(struct token *tk);
+struct token *ArrayVariable(struct token *tk);

@@ -372,7 +372,7 @@ void syntax(struct tokenList *lists){
 	struct token *tk;
 	tk = lists->start;
 	tk = tk->next;
-	Operand(tk);
+	Expression(tk);
 }
 
 int main(int argc, char *args[]){
