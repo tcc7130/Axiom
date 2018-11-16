@@ -110,6 +110,20 @@ struct token *Assign(struct token *tk){
 	return NULL;
 }
 struct token *Loop_While(struct token *tk){
+	if(tk->id == KEYWORD_WHILE){
+		tk=tk->next;
+		if(tk->id == PAREN_L){
+			tk=Operand(tk->next);
+			if(tk->id == LLAVE_L){
+				Expression(tk);
+				if(tk->id == LLAVE_R){
+					//tk=tk->next;
+					Expression(tk);
+				}
+			}			
+		}
+	}
+	printf("LOOP_WHILE\n");
 	return NULL;
 }
 struct token *Loop_For(struct token *tk){
