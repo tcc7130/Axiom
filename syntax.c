@@ -22,6 +22,9 @@ struct token *Expression(struct token *tk){
 		case KEYWORD_PRINT:
 			tk = Write(tk);
 			break;
+		case KEYWORD_PRINTLN:
+			tk = Write(tk);
+			break;
 		case SEMICOLON:
 	 		printf("Omedetou\n");
 	 		break;
@@ -117,8 +120,9 @@ struct token *Loop_While(struct token *tk){
 		tk=tk->next;
 		if(tk->id == PAREN_L){
 			tk=Operand(tk->next);
+
 			if(tk->id == LLAVE_L){
-				Expression(tk);
+				tk = Expression(tk->next);
 				if(tk->id == LLAVE_R){
 					//tk=tk->next;
 					Expression(tk);
