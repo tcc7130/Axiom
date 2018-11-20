@@ -71,8 +71,7 @@ struct token *Declare(struct token *tk){
 			tk = tk->next;
 			if(tk->id == ASSIGN){
 				tk = Operand(tk->next);
-				if(tk == NULL)
-					return NULL;
+				if(tk == NULL) return NULL;
 			}
 			while(1){
 				if(tk->id == COMA){
@@ -112,28 +111,105 @@ struct token *Assign(struct token *tk){
 			}
 		}
 	}
-
 	return NULL;
 }
+
 struct token *Loop_While(struct token *tk){
+	printf("LOOP_WHILE\n");
+	struct token *temp;
 	if(tk->id == KEYWORD_WHILE){
 		tk=tk->next;
 		if(tk->id == PAREN_L){
 			tk=Operand(tk->next);
-
-			if(tk->id == LLAVE_L){
-				tk = Expression(tk->next);
-				if(tk->id == LLAVE_R){
-					//tk=tk->next;
-					Expression(tk);
-				}
+			if(tk != NULL) {
+				if(tk->id == PAREN_R){
+					tk=tk->next;
+					if(tk->id == LLAVE_L){
+						tk = tk->next;
+						do{
+							printf("Looking for an expression\n");
+							temp = Expression(tk);
+							if(temp!=NULL) tk = temp;
+						} while(temp != NULL);
+						if(tk->id == LLAVE_R){
+							printf("%s\n", tk->content);
+							printf("NICE\n");
+							return tk->next;
+						}
+					}
+				}				
 			}			
 		}
 	}
-	printf("LOOP_WHILE\n");
 	return NULL;
 }
 struct token *Loop_For(struct token *tk){
+	printf("LOOP_FOR\n");
+	struct token *temp;
+	if(tk->id == KEYWORD_FOR){
+		tk=tk->next;
+		if(tk->id == PAREN_L){
+			tk=Declare(tk->next);
+			if(tk != NULL){
+				if(tk->id == SEMICOLON){
+					tk=Operand(tk->next);
+					if(tk != NULL){
+						if(tk->id == SEMICOLON){
+							tk=Assign(tk->next);
+							if(tk != NULL){
+								tk=tk->next;
+								if(tk->id == PAREN_R){
+									tk=tk->next;
+									if(tk->id == LLAVE_L){
+										do{
+											printf("Looking for an expression\n");
+											temp = Expression(tk);
+											if(temp!=NULL) tk = temp;
+										} while(temp != NULL);
+										if(tk->id == LLAVE_R){
+											printf("%s\n", tk->content);
+											printf("NICE\n");
+											return tk->next;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			} else {
+				tk=Assign(tk->next);
+				if(tk != NULL){
+					if(tk->id == SEMICOLON){
+						tk=Operand(tk->next);
+						if(tk != NULL){
+							if(tk->id == SEMICOLON){
+								tk=Assign(tk->next);
+								if(tk != NULL){
+									tk=tk->next;
+									if(tk->id == PAREN_R){
+										tk=tk->next;
+										if(tk->id == LLAVE_L){
+											do{
+												printf("Looking for an expression\n");
+												temp = Expression(tk);
+												if(temp!=NULL) tk = temp;
+											} while(temp != NULL);
+											if(tk->id == LLAVE_R){
+												printf("%s\n", tk->content);
+												printf("NICE\n");
+												return tk->next;
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 	return NULL;
 }
 struct token *Read(struct token *tk){
