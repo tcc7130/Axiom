@@ -1,30 +1,36 @@
 struct token *Expression(struct token *tk){
 	printf("EXPRESSION START: %s\n", tk->content);
-	if(tk->id == KEYWORD_IF){
-		tk = Condition(tk);
+	switch(tk->id){
+		case KEYWORD_IF:
+			tk = Condition(tk);
+			break;	
+		case VARIABLE_TYPE:
+			tk = Declare(tk);
+			break;
+		case VARIABLE_NAME:
+			tk = Assign(tk);
+			break;
+		case KEYWORD_WHILE:
+			tk = Loop_While(tk);
+			break;
+		case KEYWORD_FOR:
+			tk = Loop_For(tk);
+			break;
+		case KEYWORD_READ:
+			tk = Read(tk);
+			break;
+		case KEYWORD_PRINT:
+			tk = Write(tk);
+			break;
+		case KEYWORD_PRINTLN:
+			tk = Write(tk);
+			break;
+		case SEMICOLON:
+	 		printf("Omedetou\n");
+	 		break;
+		default:
+	 		return NULL;
 	}
-	else if(tk->id == VARIABLE_TYPE){
-		tk = Declare(tk);
-	}
-	else if(tk->id == VARIABLE_NAME){
-		tk = Assign(tk);
-	}
-	else if(tk->id == KEYWORD_WHILE){
-		tk = Loop_While(tk);
-	}
-	else if(tk->id == KEYWORD_FOR){
-		tk = Loop_For(tk);
-	}
-	else if(tk->id == KEYWORD_READ){
-		tk = Read(tk);
-	}
-	else if(tk->id == KEYWORD_PRINT){
-		tk = Write(tk);
-	}
-	if(tk->id == SEMICOLON){
-	 	printf("Omedetou\n");
-	}
-	return NULL;
 }
 
 struct token *Condition(struct token *tk){
@@ -67,8 +73,7 @@ struct token *Declare(struct token *tk){
 			if(temp == NULL) tk = tk->next;
 			if(tk->id == ASSIGN){
 				tk = Operand(tk->next);
-				if(tk == NULL)
-					return NULL;
+				if(tk == NULL) return NULL;
 			}
 			while(1){
 				if(tk->id == COMA){
@@ -110,13 +115,105 @@ struct token *Assign(struct token *tk){
 			}
 		}
 	}
-
 	return NULL;
 }
+
 struct token *Loop_While(struct token *tk){
+	printf("LOOP_WHILE\n");
+	struct token *temp;
+	if(tk->id == KEYWORD_WHILE){
+		tk=tk->next;
+		if(tk->id == PAREN_L){
+			tk=Operand(tk->next);
+			if(tk != NULL) {
+				if(tk->id == PAREN_R){
+					tk=tk->next;
+					if(tk->id == LLAVE_L){
+						tk = tk->next;
+						do{
+							printf("Looking for an expression\n");
+							temp = Expression(tk);
+							if(temp!=NULL) tk = temp;
+						} while(temp != NULL);
+						if(tk->id == LLAVE_R){
+							printf("%s\n", tk->content);
+							printf("NICE\n");
+							return tk->next;
+						}
+					}
+				}				
+			}			
+		}
+	}
 	return NULL;
 }
 struct token *Loop_For(struct token *tk){
+	printf("LOOP_FOR\n");
+	struct token *temp;
+	if(tk->id == KEYWORD_FOR){
+		tk=tk->next;
+		if(tk->id == PAREN_L){
+			tk=Declare(tk->next);
+			if(tk != NULL){
+				if(tk->id == SEMICOLON){
+					tk=Operand(tk->next);
+					if(tk != NULL){
+						if(tk->id == SEMICOLON){
+							tk=Assign(tk->next);
+							if(tk != NULL){
+								tk=tk->next;
+								if(tk->id == PAREN_R){
+									tk=tk->next;
+									if(tk->id == LLAVE_L){
+										do{
+											printf("Looking for an expression\n");
+											temp = Expression(tk);
+											if(temp!=NULL) tk = temp;
+										} while(temp != NULL);
+										if(tk->id == LLAVE_R){
+											printf("%s\n", tk->content);
+											printf("NICE\n");
+											return tk->next;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			} else {
+				tk=Assign(tk->next);
+				if(tk != NULL){
+					if(tk->id == SEMICOLON){
+						tk=Operand(tk->next);
+						if(tk != NULL){
+							if(tk->id == SEMICOLON){
+								tk=Assign(tk->next);
+								if(tk != NULL){
+									tk=tk->next;
+									if(tk->id == PAREN_R){
+										tk=tk->next;
+										if(tk->id == LLAVE_L){
+											do{
+												printf("Looking for an expression\n");
+												temp = Expression(tk);
+												if(temp!=NULL) tk = temp;
+											} while(temp != NULL);
+											if(tk->id == LLAVE_R){
+												printf("%s\n", tk->content);
+												printf("NICE\n");
+												return tk->next;
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 	return NULL;
 }
 struct token *Read(struct token *tk){
@@ -147,9 +244,9 @@ struct token *Read(struct token *tk){
 			}
 		}
 	}
-
 	return NULL;
 }
+
 struct token *Write(struct token *tk){
 	if(tk->id == KEYWORD_PRINT || tk->id == KEYWORD_PRINTLN){
 		tk = tk->next;
