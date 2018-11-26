@@ -1,4 +1,5 @@
 typedef enum {
+	STMT_START,
 	STMT_DECL,
 	STMT_EXPR,
 	STMT_IF_ELSE,
@@ -20,4 +21,14 @@ struct stmt {
 	struct stmt *next;
 };
 
+
+struct stmt createStmt(stmt_t k);
+
+struct stmt createStmt(stmt_t k){
+	struct stmt *s = malloc(sizeof(*s));
+	s->kind=k;
+	s->next=NULL;
+
+	return s;
+}
 

@@ -10,5 +10,4 @@ typedef enum {
 struct type {
 	type_t kind;
 	struct type *subtype;
-	struct param_list *params;
 };

@@ -13,4 +13,7 @@ struct decl *createDecl (char *n, struct type *t, struct expr *v){
 	d->type = t;
 	d->value = v;
 	d->next = NULL;
+
+	return d;
+
 }

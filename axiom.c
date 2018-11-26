@@ -138,6 +138,7 @@ struct token *createToken(int id, char *word, struct token *tok){
 	tok->next = NULL;
 	//printf("Found token: %s\n", tok->content);
 	id != -1 ? printf("Found token: %s\n", tok->content) : printf("Undefined token: %s\n", tok->content); 
+
 	return tok; 
 }
 
@@ -147,7 +148,7 @@ struct tokenList *lex(FILE *fp){
 
 	struct token *head;
 	head = malloc(sizeof(struct token));
-	head->id = 0;
+	head->id = START;
 	head->content = "START";
 	head->next = NULL;
 	lists->start = head;
@@ -167,8 +168,10 @@ struct tokenList *lex(FILE *fp){
 
 	int j;
 	int isString = 0;
+	int line=0;
 
    	while(fgets(buf, 255, fp)){
+   		currentToken->line = line;
    		//printf("\nbuf: %s\n", buf);
 		memset(word, 0, sizeof(word));
 		j = 0;
@@ -357,6 +360,7 @@ struct tokenList *lex(FILE *fp){
 				}
 			}		
 		}
+		line++;
 	}
 
 	printf("LIST:\n");
@@ -368,6 +372,7 @@ struct tokenList *lex(FILE *fp){
 }
 
 void syntax(struct tokenList *lists){
+	struct stmt *st=createStmt(STMT_START);
 	//printf("%i\n", lists->start->id);
 	struct token *tk;
 	tk = lists->start;
