@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "axiom.h"
+#include "table.h"
 #include "syntax.c"
 
 struct token *checksToken(char *word, struct token *tok){
@@ -371,10 +372,13 @@ struct tokenList *lex(FILE *fp){
     return lists;
 }
 
-void syntax(struct tokenList *lists){
-	struct stmt *st=createStmt(STMT_START);
+struct table *syntax(struct tokenList *lists){
 	//printf("%i\n", lists->start->id);
 	struct token *tk;
+	struct table *t;
+	struct symbol *s=createSymbol("inicio");
+	t->start =s;
+	t->current=s;
 	tk = lists->start;
 	tk = tk->next;
 	Expression(tk);
