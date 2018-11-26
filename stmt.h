@@ -5,6 +5,7 @@ typedef enum {
 	STMT_IF_ELSE,
 	STMT_FOR,
 	STMT_PRINT,
+	STMT_RETURN,
 	STMT_BLOCK,
 	STMT_READ
 } stmt_t;
@@ -19,6 +20,7 @@ struct stmt {
 	struct stmt *else_body;
 	struct stmt *next;
 };
+
 
 struct stmt createStmt(stmt_t k);
 
