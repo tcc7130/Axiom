@@ -67,3 +67,10 @@ struct expr *createExprFloatLiteral(float f){
 	e->float_literal = f;
 	return e;
 }
+
+	int integer_literal;
+	const char * string_literal;
+	const char char_literal;
+	float float_literal; // float o double??
+};
+
