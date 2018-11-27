@@ -399,4 +399,5 @@ int main(int argc, char *args[]){
 
 	struct tokenList *tl = lex(fp);
 	syntax(tl);
+
 }

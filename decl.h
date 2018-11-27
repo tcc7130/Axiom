@@ -15,5 +15,4 @@ struct decl *createDecl (char *n, struct type *t, struct expr *v){
 	d->next = NULL;
 
 	return d;
-
 }
