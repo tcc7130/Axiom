@@ -18,7 +18,7 @@ int endsToken(char c);
 struct token *checksToken(char *word, struct token *tok);
 struct token *createToken(int id, char *word, struct token *tok);
 struct tokenList *lex(FILE *fp);
-struct table *syntax(struct tokenList *tokens);
+void syntax(struct tokenList *tokens);
 
 struct token *Expression(struct token *tk);
 struct token *Condition(struct token *tk);

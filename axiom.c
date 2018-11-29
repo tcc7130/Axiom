@@ -372,7 +372,7 @@ struct tokenList *lex(FILE *fp){
     return lists;
 }
 
-struct table *syntax(struct tokenList *lists){
+void syntax(struct tokenList *lists){
 	//printf("%i\n", lists->start->id);
 	struct token *tk;
 	struct table *t;
