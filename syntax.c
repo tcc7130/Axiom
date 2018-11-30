@@ -53,12 +53,18 @@ struct token *Condition(struct token *tk){
 						if(tk->id == LLAVE_R){
 							printf("NICE\n");
 							return tk->next;
-						}
-					}
-				}
-			}
-		}
-	}
+						} else
+							printf("Unexpected token %s in line %i\n",tk->content,tk->line);
+					} else
+						printf("Unexpected token %s in line %i\n",tk->content,tk->line);						
+				} else
+					printf("Unexpected token %s in line %i\n",tk->content,tk->line);
+			} else
+				printf("Unexpected token %s in line %i\n",tk->content,tk->line);
+		} else
+			printf("Unexpected token %s in line %i\n",tk->content,tk->line);
+	} else
+		printf("Unexpected token %s in line %i\n",tk->content,tk->line);
 	printf("CONDITION\n");
 	return NULL;
 }
@@ -104,6 +110,7 @@ struct token *Declare(struct token *tk){
 			return tk;
 		}
 	}
+	printf("DECLARE\n");
 	return NULL;
 }
 struct token *Assign(struct token *tk){
@@ -122,6 +129,7 @@ struct token *Assign(struct token *tk){
 			}
 		}
 	}
+	printf("ASSIGN\n");
 	return NULL;
 }
 
@@ -152,6 +160,7 @@ struct token *Loop_While(struct token *tk){
 			}			
 		}
 	}
+	printf("LOOP_WHILE\n");
 	return NULL;
 }
 struct token *Loop_For(struct token *tk){
@@ -221,6 +230,7 @@ struct token *Loop_For(struct token *tk){
 			}
 		}
 	}
+	printf("LOOP_FOR\n");
 	return NULL;
 }
 struct token *Read(struct token *tk){
@@ -251,6 +261,7 @@ struct token *Read(struct token *tk){
 			}
 		}
 	}
+	printf("READ\n");
 	return NULL;
 }
 
@@ -267,6 +278,7 @@ struct token *Write(struct token *tk){
 			}
 		}
 	}
+	printf("WRITE\n");
 	return NULL;
 }
 struct token *Operand(struct token *tk){
