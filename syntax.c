@@ -59,6 +59,7 @@ struct token *Condition(struct token *tk){
 			}
 		}
 	}
+	printf("CONDITION\n");
 	return NULL;
 }
 struct token *Operation(struct token *tk){
