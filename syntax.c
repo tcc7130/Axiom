@@ -25,11 +25,12 @@ struct token *Expression(struct token *tk){
 		case KEYWORD_PRINTLN:
 			tk = Write(tk);
 			break;
-		case SEMICOLON:
-	 		printf("Omedetou\n");
-	 		break;
 		default:
 	 		return NULL;
+	}
+	if(tk->id == SEMICOLON){
+		tk = tk->next;
+		printf("Omedetou\n");
 	}
 	return tk;
 }
