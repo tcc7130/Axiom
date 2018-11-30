@@ -15,8 +15,8 @@ struct tokenList{
 };
 
 int endsToken(char c);
-struct token *checksToken(char *word, struct token *tok);
-struct token *createToken(int id, char *word, struct token *tok);
+struct token *checksToken(char *word, struct token *tok, int line);
+struct token *createToken(int id, char *word, struct token *tok, int line);
 struct tokenList *lex(FILE *fp);
 void syntax(struct tokenList *tokens);
 
