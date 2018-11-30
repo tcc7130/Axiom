@@ -31,6 +31,7 @@ struct token *Expression(struct token *tk){
 		default:
 	 		return NULL;
 	}
+	return tk;
 }
 
 struct token *Condition(struct token *tk){
@@ -64,19 +65,19 @@ struct token *Operation(struct token *tk){
 	return NULL;
 }
 struct token *Declare(struct token *tk){
-	struct symbol *sy;
-	TokenType type;
+	//struct symbol *sy;
+	//TokenType type;
 	struct token *temp;
 	if(tk->id == VARIABLE_TYPE){
-		type=checkType(id->content);
+		//type=checkType(id->content);
 		tk = tk->next;
 		temp = ArrayVariable(tk);
 		if(temp != NULL) tk = temp;
 		if(temp != NULL || tk->id == VARIABLE_NAME){
-			sy=createSymbol(tk->content,type);
+			//sy=createSymbol(tk->content,type);
 			if(temp == NULL) tk = tk->next;
 			if(tk->id == ASSIGN){
-				sy=checkTypeAssign(sy,tk->next);
+				//sy=checkTypeAssign(sy,tk->next);
 				tk = Operand(tk->next);
 				if(tk == NULL) return NULL;
 			}

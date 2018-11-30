@@ -375,10 +375,10 @@ struct tokenList *lex(FILE *fp){
 void syntax(struct tokenList *lists){
 	//printf("%i\n", lists->start->id);
 	struct token *tk;
-	struct table *t;
-	struct symbol *s=createSymbol("inicio");
-	t->start =s;
-	t->current=s;
+	//struct table *t;
+	// struct symbol *s=createSymbol("inicio");
+	// t->start =s;
+	// t->current=s;
 	tk = lists->start;
 	tk = tk->next;
 	Expression(tk);
