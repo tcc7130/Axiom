@@ -376,11 +376,8 @@ struct tokenList *lex(FILE *fp){
 void syntax(struct tokenList *lists){
 	//printf("%i\n", lists->start->id);
 	struct token *tk;
-	struct token *temp;
-	//struct table *t;
-	// struct symbol *s=createSymbol("inicio");
-	// t->start =s;
-	// t->current=s;
+	struct token *temp;	
+	t = createTable();
 	tk = lists->start;
 	tk = tk->next;
 
@@ -409,5 +406,7 @@ int main(int argc, char *args[]){
 
 	struct tokenList *tl = lex(fp);
 	syntax(tl);
-
+	printTable(t);
+	//struct symbol *s = t->start;
+	//printf("Start-> nombre: %s, tipo: %i, value: %i\n",s->name,s->type,s->valueI);
 }

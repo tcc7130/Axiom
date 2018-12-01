@@ -1,3 +1,4 @@
+struct table *t;
 struct token *Expression(struct token *tk){
 	printf("EXPRESSION START: %s\n", tk->content);
 	switch(tk->id){
@@ -74,60 +75,94 @@ struct token *Operation(struct token *tk){
 	return NULL;
 }
 struct token *Declare(struct token *tk){
-	//struct symbol *sy;
-	//TokenType type;
-	struct token *temp;
+	struct symbol *sy;
+	TokenType type;
+	struct token *temp = NULL;
+	char *word = malloc(sizeof(*word));
 	if(tk->id == VARIABLE_TYPE){
-		//type=checkType(id->content);
+		type=checkType(tk->content);
 		tk = tk->next;
-		temp = ArrayVariable(tk);
-		if(temp != NULL) tk = temp;
-		if(temp != NULL || tk->id == VARIABLE_NAME){
-			//sy=createSymbol(tk->content,type);
-			if(temp == NULL) tk = tk->next;
-			if(tk->id == ASSIGN){
-				//sy=checkTypeAssign(sy,tk->next);
+		if(tk->id == VARIABLE_NAME){
+			word=tk->content;
+			sy=createSymbol(word,type);
+			tk=tk->next;
+			temp=ArrayVariable(tk);
+			addSymbol(sy,t);
+
+			if(temp != NULL) tk = temp;
+
+			if(tk->id == ASSIGN){				
+				sy=checkVariable(word,t);
+				if(sy!=NULL)
+					{sy=checkTypeAssign(sy, tk->next);}
+				else 
+					{printf("ERROR: Variable %s is not declared, can not assign value\n",word);}
 				tk = Operand(tk->next);
 				if(tk == NULL) return NULL;
-			} else
-				printf("Unexpected token %s in line %i\n",tk->content,tk->line);
-			while(1){
-				if(tk->id == COMA){
-					tk = tk->next;
-					temp = ArrayVariable(tk);
-					if(temp != NULL) tk = temp;
-					if(temp != NULL || tk->id == VARIABLE_NAME){
-						if(temp == NULL) tk = tk->next;
-						if(tk->id == ASSIGN){
-							tk = Operand(tk->next);
-							if(tk == NULL){
-								return NULL;
-							} else
-								printf("Unexpected token %s in line %i\n",tk->content,tk->line);
-						}
-						else {
-							printf("Unexpected token %s in line %i\n",tk->content,tk->line);
-							continue;
-						}
-					} else
-						printf("Unexpected token %s in line %i\n",tk->content,tk->line);
-				}
-				else break;
+			} else if(tk->id == COMA){
+				while(1){
+					if(tk->id == COMA){
+						tk = tk->next;
+						if(tk->id == VARIABLE_NAME){
+							word=tk->content;
+							sy=createSymbol(word,type);
+							addSymbol(sy,t);
+							tk=tk->next;
+							temp = ArrayVariable(tk);					
+							if(temp != NULL) tk = temp;
+
+							if(tk->id == ASSIGN){
+								sy=checkVariable(word,t);
+								if(sy!=NULL)
+									{sy=checkTypeAssign(sy, tk->next);}
+								else 
+									{printf("ERROR: Variable %s is not declared, can not assign value\n",word);}
+								tk = Operand(tk->next);
+								if(tk == NULL){
+									printf("Unexpected token %s in line %i operand \n",tk->content,tk->line);
+									return NULL;
+								} else
+									continue;
+							} else if(tk->id == SEMICOLON){
+								break;
+							} else {
+								printf("Unexpected token %s in line %i ASSIGN \n",tk->content,tk->line);
+								tk=tk->next;
+								continue;
+							}
+						} else
+							printf("Unexpected token %s in line %i VARIABLE_NAME\n",tk->content,tk->line);
+					} else break;
+				}				
+			} else {
+				printf("Unexpected token %s in line %i ASSIGN \n",tk->content,tk->line);
+				tk=tk->next;
 			}
-			printf("Hi: %s", tk->content);
+			
+			printf("Hi: %s\n", tk->content);
 			return tk;
 		}
-	}
+	}		
 	printf("DECLARE\n");
 	return NULL;
 }
 struct token *Assign(struct token *tk){
-	struct token *temp;
-	temp = ArrayVariable(tk);
-	if(temp != NULL) tk = temp;
-	if(temp != NULL || tk->id == VARIABLE_NAME){
-		if(temp == NULL) tk = tk->next;
+	struct token *temp=NULL;
+	struct symbol *sy;
+	char *word=malloc(sizeof(*word));
+	if(tk->id == VARIABLE_NAME){
+		word=tk->content;
+		tk=tk->next;
+
+		temp=ArrayVariable(tk);
+		if(temp!=NULL) tk=temp;
+
 		if(tk->id == ASSIGN){
+			sy=checkVariable(word,t);
+			if(sy!=NULL)
+				{sy=checkTypeAssign(sy, tk->next);}
+			else 
+				{printf("ERROR: Variable %s is not declared, can not assign value\n",word);}
 			tk = Operand(tk->next);
 			if(tk != NULL){
 				if(tk->id == INCREMENT || tk->id == DECREMENT){
@@ -142,6 +177,7 @@ struct token *Assign(struct token *tk){
 			printf("Unexpected token %s in line %i\n",tk->content,tk->line);
 	} else
 		printf("Unexpected token %s in line %i\n",tk->content,tk->line);
+
 	printf("ASSIGN\n");
 	return NULL;
 }
@@ -268,24 +304,27 @@ struct token *Loop_For(struct token *tk){
 	return NULL;
 }
 struct token *Read(struct token *tk){
-	struct token *temp;
+	struct token *temp=NULL;
 	if(tk->id == KEYWORD_READ){
 		tk = tk->next;
 		if(tk->id == PAREN_L){
 			tk = tk->next;
-			temp = ArrayVariable(tk);
-			if(temp != NULL) tk=temp;
-			if(temp != NULL || tk->id == VARIABLE_NAME){
-				if(temp == NULL) tk = tk->next;
+			if(tk->id == VARIABLE_NAME){
+				tk=tk->next;
+				temp = ArrayVariable(tk);
+				if(temp != NULL) tk=temp;
 				while(1){
 					if(tk->id == COMA){
 						tk = tk->next;
-						temp = ArrayVariable(tk);
-						if(temp != NULL) tk=temp;
-						if(temp != NULL || tk->id == VARIABLE_NAME){
-							if(temp == NULL) tk = tk->next;
+						if(tk->id == VARIABLE_NAME){
+							tk=tk->next;
+							temp = ArrayVariable(tk);
+							if(temp != NULL) tk=temp;							
 						}
-						else return NULL;
+						else {
+							printf("Unexpected token %s in line %i\n",tk->content,tk->line);
+							return NULL;
+						}
 					}
 					else break;
 				}
@@ -324,45 +363,36 @@ struct token *Write(struct token *tk){
 }
 struct token *Operand(struct token *tk){
 	printf("Starting to analyze Operand: %s\n", tk->content);
-	struct token *temp;
-	temp = ArrayVariable(tk);
-	if(temp != NULL) tk = temp;
-	if(temp != NULL || tk->id == VARIABLE_NAME || tk->id == INTEGER || tk->id == DECIMAL || tk->id == STRING || tk->id == KCHAR){
-		if(temp == NULL) tk = tk->next;
+	struct token *temp = NULL;
+	if(tk->id==VARIABLE_NAME || tk->id==INTEGER || tk->id==DECIMAL || tk->id==STRING || tk->id==KCHAR){
+		tk=tk->next;
+		temp = ArrayVariable(tk);
+		if(temp != NULL) tk=temp;		
 		while(1){
 			if(tk->id == ARITMETIC_OP || tk->id == COMPARE_OP){
 				tk = tk->next;
-				temp = ArrayVariable(tk);
-				if(temp != NULL) tk = temp;
-				if(temp!= NULL || tk->id == VARIABLE_NAME || tk->id == INTEGER || tk->id == DECIMAL || tk->id == STRING || tk->id == KCHAR){
-					if(temp == NULL) tk = tk->next;
-				} 
-				else {
-					printf("Unexpected token %s in line %i\n",tk->content,tk->line);
-					if(tk->id == PAREN_L){
-						tk = Operand(tk->next);
-						if(tk->id == PAREN_R){
-							tk = tk->next;
-						}
-						else {
-							printf("Unexpected token %s in line %i\n",tk->content,tk->line);
-							return NULL;
-						}
-					} else {
-						printf("Unexpected token %s in line %i\n",tk->content,tk->line);
-						return NULL;
-					}
-				}				
-			}
-			else{ 
-				printf("Unexpected token %s in line %i\n",tk->content,tk->line);
+				if(tk->id == VARIABLE_NAME || tk->id == INTEGER || tk->id == DECIMAL || tk->id == STRING || tk->id == KCHAR){
+					tk=tk->next;
+					temp = ArrayVariable(tk);
+					if(temp != NULL) tk = temp;	
+				} else if(tk->id == PAREN_L){
+					tk=Operand(tk->next);
+					if(tk->id == PAREN_R)
+						tk=tk->next;
+					else
+						printf("Unexpected token %s in line %i op1\n",tk->content,tk->line);
+				}
+			} else
 				break;
-			}
-		}
-		printf("Found an operand, yay\n");
+		} // end while
 		return tk;
-	}
-	printf("Unexpected token %s in line %i\n",tk->content,tk->line);
+	} else if(tk->id == PAREN_L){
+		tk=Operand(tk->next);
+		if(tk->id == PAREN_R)
+			tk=tk->next;
+		else
+			printf("Unexpected token %s in line %i op2\n",tk->content,tk->line);
+	} 
 	return NULL;
 }
 struct token *OperandInt(struct token *tk){
@@ -400,18 +430,13 @@ struct token *OperandInt(struct token *tk){
 	}
 	return NULL;
 }
-struct token *ArrayVariable(struct token *tk){
-	if(tk->id == VARIABLE_NAME){
-		tk = tk->next;
-		if(tk->id == CORCHETE_L){
-			tk = OperandInt(tk->next);
-			if(tk != NULL && tk->id == CORCHETE_R){
-				return tk->next;
-			} else
-				printf("Unexpected token %s in line %i\n",tk->content,tk->line);
+struct token *ArrayVariable(struct token *tk){	
+	if(tk->id == CORCHETE_L){
+		tk = OperandInt(tk->next);
+		if(tk != NULL && tk->id == CORCHETE_R){
+			return tk->next;
 		} else
 			printf("Unexpected token %s in line %i\n",tk->content,tk->line);
-	}
-	printf("Unexpected token %s in line %i\n",tk->content,tk->line);
+	} 	
 	return NULL;
 }
