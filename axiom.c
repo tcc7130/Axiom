@@ -325,6 +325,11 @@ struct tokenList *lex(FILE *fp){
 						j = 0;
 						currentToken = createToken(ARITMETIC_OP, "/", currentToken,line);
 						break;
+					case '%':
+						currentToken = checksToken(word, currentToken,line);
+						memset(word, 0, sizeof(word));
+						j = 0;
+						currentToken = createToken(ARITMETIC_OP, "%", currentToken, line);
 				}
 
 				if(!isspace(buf[i]) && buf[i] != '(' && buf[i] != ')' 
