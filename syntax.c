@@ -388,7 +388,6 @@ struct token *Operand(struct token *tk, FILE *fp){
 	temp = ArrayVariable(tk, fp);
 	if(temp != NULL) tk = temp;
 	if(temp != NULL || tk->id == VARIABLE_NAME || tk->id == INTEGER || tk->id == DECIMAL || tk->id == STRING || tk->id == KCHAR){
-		printf("GOING TO PUSH %s\n", tk->content);
 		if(tk->id == VARIABLE_NAME){
 			fputs("PUSH ", fp);
 			fputs(strcat(tk->content, "\n"), fp);
@@ -413,20 +412,34 @@ struct token *Operand(struct token *tk, FILE *fp){
 		if(temp == NULL) tk = tk->next;
 		while(1){
 			if(tk->id == ARITMETIC_OP || tk->id == COMPARE_OP){
-				printf("Checking \n");
 				if(top > -1){
 					if(strcmp(tk->content, "*") != 0 && strcmp(tk->content, "/") != 0){
 						printf("Current node is %s, node on top of stack is %s\n", tk->content, opStack[top]->content);
-						while(top > - 1 && (!strcmp(opStack[top]->content, "*") || !strcmp(opStack[top]->content, "/"))){
+						while(top > - 1){
 							printf("YES");
-							if(!strcmp(opStack[top]->content, "*"))
+							if(!strcmp(opStack[top]->content, "+"))
+								fputs("ADD\n", fp);
+							else if(!strcmp(opStack[top]->content, "-"))
+								fputs("SUB\n", fp);
+							else if(!strcmp(opStack[top]->content, "*"))
 								fputs("MUL\n", fp);
 							else if(!strcmp(opStack[top]->content, "/"))
 								fputs("DIV\n", fp);
+							else if(!strcmp(opStack[top]->content, "%"))
+								fputs("MOD\n", fp);
+							else if(!strcmp(opStack[top]->content, "=="))
+								fputs("CEQ\n", fp);
+							else if(!strcmp(opStack[top]->content, "!="))
+								fputs("CNE\n", fp);
+							else if(!strcmp(opStack[top]->content, ">"))
+								fputs("CGT\n", fp);
+							else if(!strcmp(opStack[top]->content, ">="))
+								fputs("CGE\n", fp);
+							else if(!strcmp(opStack[top]->content, "<"))
+								fputs("CLT\n", fp);
+							else if(!strcmp(opStack[top]->content, "<="))
+								fputs("CLE\n", fp);
 							top--;
-							printf("Current stack size is %i\n", top);
-							//printf("node on top of stack is %s\n", opStack[top]->content);
-							//top--;
 						}
 					}
 				}
