@@ -1,3 +1,4 @@
-int a, b=6,c;
+int a, b=6;
+str c;
 a=1;
-c=9;
+c="te";

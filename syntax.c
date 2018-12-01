@@ -134,11 +134,10 @@ struct token *Declare(struct token *tk){
 							printf("Unexpected token %s in line %i VARIABLE_NAME\n",tk->content,tk->line);
 					} else break;
 				}				
-			} else {
+			} else if(tk->id != SEMICOLON){
 				printf("Unexpected token %s in line %i ASSIGN \n",tk->content,tk->line);
 				tk=tk->next;
-			}
-			
+			}			
 			printf("Hi: %s\n", tk->content);
 			return tk;
 		}
@@ -167,17 +166,12 @@ struct token *Assign(struct token *tk){
 			if(tk != NULL){
 				if(tk->id == INCREMENT || tk->id == DECREMENT){
 					return tk->next;
-				} else {
-					printf("Unexpected token %s in line %i\n",tk->content,tk->line);
-					return tk;
-				}
+				} else return tk;
 			} else
 				printf("Unexpected token %s in line %i\n",tk->content,tk->line);
 		} else 
 			printf("Unexpected token %s in line %i\n",tk->content,tk->line);
-	} else
-		printf("Unexpected token %s in line %i\n",tk->content,tk->line);
-
+	}	
 	printf("ASSIGN\n");
 	return NULL;
 }
