@@ -31,4 +31,3 @@ struct stmt createStmt(stmt_t k){
 
 	return s;
 }
-
