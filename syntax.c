@@ -217,7 +217,7 @@ struct token *Declare(struct token *tk, FILE *fp){
 	char *word = malloc(sizeof(*word));
 
 	if(tk->id == VARIABLE_TYPE){
-		type=checkType(id->content);
+		type=checkType(tk->content);
 		tk = tk->next;
 		if(tk->id == VARIABLE_NAME){
 			word=tk->content;
@@ -599,7 +599,7 @@ struct token *Operand(struct token *tk, FILE *fp){
 					temp = ArrayVariable(tk,fp);
 					if(temp != NULL) tk = temp;	
 				} else if(tk->id == PAREN_L){
-					tk=Operand(tk->next);
+					tk=Operand(tk->next,fp);
 					if(tk->id == PAREN_R)
 						tk=tk->next;
 					else
@@ -693,7 +693,7 @@ struct token *Operand(struct token *tk, FILE *fp){
 		}
 		return tk;
 	} else if(tk->id == PAREN_L){
-		tk=Operand(tk->next);
+		tk=Operand(tk->next,fp);
 		if(tk->id == PAREN_R)
 			tk=tk->next;
 		else
