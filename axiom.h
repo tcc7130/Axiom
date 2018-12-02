@@ -22,6 +22,8 @@ void syntax(struct tokenList *tokens);
 
 struct token *Expression(struct token *tk);
 struct token *Condition(struct token *tk);
+struct token *Condition_Elif(struct token *tk);
+
 struct token *Operation(struct token *tk);
 struct token *Declare(struct token *tk);
 struct token *Assign(struct token *tk);

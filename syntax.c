@@ -51,6 +51,9 @@ struct token *Expression(struct token *tk){
 		case KEYWORD_PRINTLN:
 			tk = Write(tk);
 			break;
+		case KEYWORD_ELIF:
+			tk = Condition_Elif(tk);
+			break;
 		default:
 	 		return NULL;
 	}
@@ -79,6 +82,32 @@ struct token *Condition(struct token *tk){
 							if(temp!=NULL) tk = temp;
 						}while(temp != NULL);
 						if(tk->id == LLAVE_R){
+							tk = tk->next;
+							if (tk->id == KEYWORD_ELSE) {
+								tk = tk->next;
+								if (tk->id == LLAVE_L) {
+									tk = tk->next;
+									do {
+										printf("Looking for an expression\n");
+										temp = Expression(tk);
+										if (temp != NULL) tk = temp;
+									} while (temp != NULL);
+									if (tk->id == LLAVE_R) {
+										printf("NICE\n");
+										return tk->next;
+									}
+									else
+										printf("Unexpected token %s in line %i\n", tk->content, tk->line);
+								}
+								else
+									printf("Unexpected token %s in line %i\n", tk->content, tk->line);
+							}
+							if (tk->id== KEYWORD_ELIF) {
+								tk = Condition_Elif(tk);
+								printf("NICE\n");
+
+								return tk;
+							}
 							printf("NICE\n");
 							return tk->next;
 						} else
@@ -96,6 +125,72 @@ struct token *Condition(struct token *tk){
 	printf("CONDITION\n");
 	return NULL;
 }
+
+struct token *Condition_Elif(struct token *tk) {
+	struct token *temp;
+	if (tk->id == KEYWORD_ELIF) {
+		tk = tk->next;
+		if (tk->id == PAREN_L) {
+			tk = Operand(tk->next);
+			if (tk != NULL) {
+				if (tk->id == PAREN_R) {
+					tk = tk->next;
+					if (tk->id == LLAVE_L) {
+						tk = tk->next;
+						do {
+							printf("Looking for an expression\n");
+							temp = Expression(tk);
+							if (temp != NULL) tk = temp;
+						} while (temp != NULL);
+						if (tk->id == LLAVE_R) {
+							tk = tk->next;
+							if (tk->id == KEYWORD_ELSE) {
+								tk = tk->next;
+								if (tk->id == LLAVE_L) {
+									tk = tk->next;
+									do {
+										printf("Looking for an expression\n");
+										temp = Expression(tk);
+										if (temp != NULL) tk = temp;
+									} while (temp != NULL);
+									if (tk->id == LLAVE_R) {
+										printf("NICE\n");
+										return tk->next;
+									}
+									else
+										printf("Unexpected token %s in line %i\n", tk->content, tk->line);
+								}
+								else
+									printf("Unexpected token %s in line %i\n", tk->content, tk->line);
+							}
+							else if (tk->id == KEYWORD_ELIF) {
+								tk = Condition_Elif(tk);
+							}
+							printf("NICE");
+							printf(tk->content);
+							return tk;
+						}
+						else
+							printf("Unexpected token %s in line %i\n", tk->content, tk->line);
+					}
+					else
+						printf("Unexpected token %s in line %i\n", tk->content, tk->line);
+				}
+				else
+					printf("Unexpected token %s in line %i\n", tk->content, tk->line);
+			}
+			else
+				printf("Unexpected token %s in line %i\n", tk->content, tk->line);
+		}
+		else
+			printf("Unexpected token %s in line %i\n", tk->content, tk->line);
+	}
+	else
+		printf("Unexpected token %s in line %i\n", tk->content, tk->line);
+	printf("CONDITION\n");
+	return NULL;
+}
+
 struct token *Operation(struct token *tk){
 	return NULL;
 }
