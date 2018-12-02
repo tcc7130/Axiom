@@ -526,7 +526,7 @@ struct token *Write(struct token *tk, FILE *fp){
 				} else
 					printf("Unexpected token %s in line %i\n",tk->content,tk->line);
 			} else
-				printf("Unexpected token %s in line %i\n",tk->content,tk->line);
+				printf(":( Unexpected token %s in line %i\n",tk->content,tk->line);
 		} else
 			printf("Unexpected token %s in line %i\n",tk->content,tk->line);
 	} else
@@ -562,17 +562,19 @@ struct token *Operand(struct token *tk, FILE *fp){
 	// opStack = malloc(32*sizeof(struct token));
 	struct token **opStack = malloc(32 * sizeof(struct token));
 	int top = -1;
-
-	printf("Starting to analyze Operand: %s\n", tk->content);
+ 	printf("Starting to analyze Operand: %s\n", tk->content);
 	struct token *temp = NULL;
+
 	if(tk->id == VARIABLE_NAME || tk->id == INTEGER || tk->id == DECIMAL || tk->id == STRING || tk->id == KCHAR){
-		tk=tk->next;
-		temp = ArrayVariable(tk,fp);
-		if(temp != NULL) tk=temp;
-		printf("ID: %i", tk->id);
 		if(tk->id == VARIABLE_NAME){
-			fputs("PUSH ", fp);
-			fputs(strcat(tk->content, "\n"), fp);
+			temp = ArrayVariable(tk->next, fp);
+			if(temp != NULL){
+				tk = temp;
+			}
+			else{
+				fputs("PUSH ", fp);
+				fputs(strcat(tk->content, "\n"), fp);
+			}
 		}
 		else if(tk->id == INTEGER){
 			fputs("PUSHKI ", fp);
@@ -590,21 +592,9 @@ struct token *Operand(struct token *tk, FILE *fp){
 			fputs("PUSHKC ", fp);
 			fputs(strcat(tk->content, "\n"), fp);
 		}
-
+ 		if(temp == NULL) tk = tk->next;
 		while(1){
 			if(tk->id == ARITMETIC_OP){
-				tk = tk->next;
-				if(tk->id == VARIABLE_NAME || tk->id == INTEGER || tk->id == DECIMAL || tk->id == STRING || tk->id == KCHAR){
-					tk=tk->next;
-					temp = ArrayVariable(tk,fp);
-					if(temp != NULL) tk = temp;	
-				} else if(tk->id == PAREN_L){
-					tk=Operand(tk->next,fp);
-					if(tk->id == PAREN_R)
-						tk=tk->next;
-					else
-						printf("Unexpected token %s in line %i op1\n",tk->content,tk->line);
-				}				
 				if(top > -1){
 					if(strcmp(tk->content, "*") != 0 && strcmp(tk->content, "/") != 0){
 						printf("Current node is %s, node on top of stack is %s\n", tk->content, opStack[top]->content);
@@ -635,14 +625,18 @@ struct token *Operand(struct token *tk, FILE *fp){
 				printf("DONE WITH\n");
 				opStack[++top] = tk;
 				printf("THe new node on tope of stack is %s\n", opStack[top]->content);
-
-				tk = tk->next;
-				temp = ArrayVariable(tk, fp);
-				if(temp != NULL) tk = temp;
-				if(temp != NULL || tk->id == VARIABLE_NAME || tk->id == INTEGER || tk->id == DECIMAL || tk->id == STRING || tk->id == KCHAR){
+ 				tk = tk->next;
+				
+				if(tk->id == VARIABLE_NAME || tk->id == INTEGER || tk->id == DECIMAL || tk->id == STRING || tk->id == KCHAR){
 					if(tk->id == VARIABLE_NAME){
-						fputs("PUSH ", fp);
-						fputs(strcat(tk->content, "\n"), fp);
+						temp = ArrayVariable(tk->next, fp);
+						if(temp != NULL){
+							tk = temp;
+						}
+						else{
+							fputs("PUSH ", fp);
+							fputs(strcat(tk->content, "\n"), fp);
+						}
 					}
 					else if(tk->id == INTEGER){
 						fputs("PUSHKI ", fp);
@@ -660,10 +654,30 @@ struct token *Operand(struct token *tk, FILE *fp){
 						fputs("PUSHKC ", fp);
 						fputs(strcat(tk->content, "\n"), fp);
 					}
-				} 		
-			} else break;			
-		} // end while
-		return tk;
+					if(temp == NULL) tk = tk->next;
+				} 
+				else {
+					printf("Unexpected token %s in line %i\n",tk->content,tk->line);
+					if(tk->id == PAREN_L){
+						tk = Operand(tk->next, fp);
+						if(tk->id == PAREN_R){
+							tk = tk->next;
+						}
+						else {
+							printf("Unexpected token %s in line %i\n",tk->content,tk->line);
+							return NULL;
+						}
+					} else {
+						printf("Unexpected token %s in line %i\n",tk->content,tk->line);
+						return NULL;
+					}
+				}				
+			}
+			else{ 
+				printf("Unexpected token %s in line %i\n",tk->content,tk->line);
+				break;
+			}
+		}
 		printf("Found an operand, yay\n");
 		//printf("Token %s at position: %i\n", opStack[top]->content, top);
 		while(top > -1){
@@ -694,7 +708,7 @@ struct token *Operand(struct token *tk, FILE *fp){
 		return tk;
 	} else if(tk->id == PAREN_L){
 		tk=Operand(tk->next,fp);
-		if(tk->id == PAREN_R)
+		if(tk != NULL && tk->id == PAREN_R)
 			tk=tk->next;
 		else
 			printf("Unexpected token %s in line %i op2\n",tk->content,tk->line);
