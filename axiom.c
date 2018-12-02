@@ -325,6 +325,11 @@ struct tokenList *lex(FILE *fp){
 						j = 0;
 						currentToken = createToken(ARITMETIC_OP, "/", currentToken,line);
 						break;
+					case '%':
+						currentToken = checksToken(word, currentToken,line);
+						memset(word, 0, sizeof(word));
+						j = 0;
+						currentToken = createToken(ARITMETIC_OP, "%", currentToken, line);
 				}
 
 				if(!isspace(buf[i]) && buf[i] != '(' && buf[i] != ')' 
@@ -371,24 +376,6 @@ struct tokenList *lex(FILE *fp){
     	head = head->next;
     }
     return lists;
-}
-
-void syntax(struct tokenList *lists){
-	//printf("%i\n", lists->start->id);
-	struct token *tk;
-	struct token *temp;	
-	t = createTable();
-	tk = lists->start;
-	tk = tk->next;
-
-	while(1){
-		temp = Expression(tk);
-		if(temp!= NULL)
-			tk = temp;
-		else break;
-	}
-
-	//Expression(tk);
 }
 
 int main(int argc, char *args[]){
