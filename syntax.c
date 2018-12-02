@@ -627,6 +627,7 @@ struct token *Operand(struct token *tk, FILE *fp){
 				printf("THe new node on tope of stack is %s\n", opStack[top]->content);
  				tk = tk->next;
 				
+				temp = NULL;
 				if(tk->id == VARIABLE_NAME || tk->id == INTEGER || tk->id == DECIMAL || tk->id == STRING || tk->id == KCHAR){
 					if(tk->id == VARIABLE_NAME){
 						temp = ArrayVariable(tk->next, fp);
