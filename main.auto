@@ -1,6 +1,5 @@
-if(a>1){
-	b=1;
-}
-else{
-	b=1;
-};
+int a, b=6;
+str c;
+a=1;
+c="te";
+str d='3';
