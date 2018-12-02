@@ -10,10 +10,8 @@ void syntax(struct tokenList *lists){
 	if_count = 0;
 	for_count = 0;
 	while_count = 0;
-	//struct table *t;
-	// struct symbol *s=createSymbol("inicio");
-	// t->start =s;
-	// t->current=s;
+	struct table *t;
+	t=createTable();
 	tk = lists->start;
 	tk = tk->next;
 
@@ -32,7 +30,6 @@ void syntax(struct tokenList *lists){
 	}
 	fputs("EXT\n", fp);
 	printf("Done");
-	//Expression(tk, fp);
 }
 
 struct token *Expression(struct token *tk, FILE *fp){
@@ -214,19 +211,19 @@ struct token *Condition_Elif(struct token *tk, FILE *fp){
 }
 
 struct token *Declare(struct token *tk, FILE *fp){
-	//struct symbol *sy;
-	//TokenType type;
+	struct symbol *sy;
+	TokenType type;
 	struct token *temp;
 	char *word = malloc(sizeof(*word));
 
 	if(tk->id == VARIABLE_TYPE){
-		//type=checkType(id->content);
+		type=checkType(id->content);
 		tk = tk->next;
 		if(tk->id == VARIABLE_NAME){
 			word=tk->content;
-			//sy=createSymbol(tk->content,type);
+			sy=createSymbol(tk->content,type);
 			tk=tk->next;
-			temp=ArrayVariable(tk);
+			temp=ArrayVariable(tk,fp);
 			addSymbol(sy,t);
 
 			if(temp != NULL) tk = temp;
@@ -248,7 +245,7 @@ struct token *Declare(struct token *tk, FILE *fp){
 							sy=createSymbol(word,type);
 							addSymbol(sy,t);
 							tk=tk->next;
-							temp = ArrayVariable(tk);
+							temp = ArrayVariable(tk,fp);
 							if(temp != NULL) tk = temp;
 
 							if(tk->id == ASSIGN){
@@ -295,7 +292,7 @@ struct token *Assign(struct token *tk, FILE *fp){
 		word=tk->content;
 		tk=tk->next;
 
-		temp=ArrayVariable(tk);
+		temp=ArrayVariable(tk,fp);
 		if(temp!=NULL) tk=temp;
 
 		if(tk->id == ASSIGN){
@@ -486,14 +483,14 @@ struct token *Read(struct token *tk, FILE *fp){
 			tk = tk->next;
 			if(tk->id == VARIABLE_NAME){
 				tk=tk->next;
-				temp = ArrayVariable(tk);
+				temp = ArrayVariable(tk,fp);
 				if(temp != NULL) tk=temp;
 				while(1){
 					if(tk->id == COMA){
 						tk = tk->next;
 						if(tk->id == VARIABLE_NAME){
 							tk=tk->next;
-							temp = ArrayVariable(tk);
+							temp = ArrayVariable(tk,fp);
 							if(temp != NULL) tk=temp;
 						}
 						else {
@@ -570,7 +567,7 @@ struct token *Operand(struct token *tk, FILE *fp){
 	struct token *temp = NULL;
 	if(tk->id == VARIABLE_NAME || tk->id == INTEGER || tk->id == DECIMAL || tk->id == STRING || tk->id == KCHAR){
 		tk=tk->next;
-		temp = ArrayVariable(tk);
+		temp = ArrayVariable(tk,fp);
 		if(temp != NULL) tk=temp;
 
 		if(tk->id == VARIABLE_NAME){
@@ -599,7 +596,7 @@ struct token *Operand(struct token *tk, FILE *fp){
 				tk = tk->next;
 				if(tk->id == VARIABLE_NAME || tk->id == INTEGER || tk->id == DECIMAL || tk->id == STRING || tk->id == KCHAR){
 					tk=tk->next;
-					temp = ArrayVariable(tk);
+					temp = ArrayVariable(tk,fp);
 					if(temp != NULL) tk = temp;	
 				} else if(tk->id == PAREN_L){
 					tk=Operand(tk->next);
