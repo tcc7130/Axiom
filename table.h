@@ -14,16 +14,19 @@ struct symbol{
 };
 
 struct table *createTable(){
-	struct table *t = malloc(sizeof(*t));
+	struct table *t = malloc(sizeof(struct table));
 	t->start = NULL;
 	t->size = 0;
 	return t;
 }
 void addSymbol(struct symbol *s, struct table *t){
-	int size=t->size;
-	struct symbol *temp = malloc(sizeof(*temp));
-	if(t->start == NULL)
+	int size = 0;
+	size = t->size;
+	struct symbol *temp = malloc(sizeof(struct symbol));
+
+	if(t->start == NULL){
 		t->start = s;
+	}
 	 else {
 	 	temp=t->start;
 	 	while(temp->next!=NULL)

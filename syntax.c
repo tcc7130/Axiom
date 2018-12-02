@@ -10,8 +10,9 @@ void syntax(struct tokenList *lists){
 	if_count = 0;
 	for_count = 0;
 	while_count = 0;
-	struct table *t;
+	//struct table *t;
 	t=createTable();
+	printf("Current table size: %i\n", t->size);
 	tk = lists->start;
 	tk = tk->next;
 
@@ -221,13 +222,30 @@ struct token *Declare(struct token *tk, FILE *fp){
 		tk = tk->next;
 		if(tk->id == VARIABLE_NAME){
 			word=tk->content;
+			fputs("DCL", fp);
+			switch(type){
+				case INTEGER:
+					fputs("I ", fp);
+					break;
+				case DECIMAL:
+					fputs("D ", fp);
+					break;
+				case KCHAR:
+					fputs("C ", fp);
+					break;
+				case STRING:
+					fputs("S ", fp);
+					break;
+			}
+			fputs(tk->content, fp);
+			fputs("\n", fp);
+
 			sy=createSymbol(tk->content,type);
 			tk=tk->next;
-			temp=ArrayVariable(tk,fp);
+			temp = ArrayVariable(tk,fp);
 			addSymbol(sy,t);
 
 			if(temp != NULL) tk = temp;
-
 			if(tk->id == ASSIGN){
 				sy=checkVariable(word,t);
 				if(sy!=NULL)
@@ -236,15 +254,53 @@ struct token *Declare(struct token *tk, FILE *fp){
 					{printf("ERROR: Variable %s is not declared, can not assign value\n",word);}
 				tk = Operand(tk->next, fp);
 				if(tk == NULL) return NULL;
-			} else if(tk->id == COMA){
+
+				fputs("POP", fp);
+				switch(type){
+					case INTEGER:
+						fputs("I ", fp);
+						break;
+					case DECIMAL:
+						fputs("D ", fp);
+						break;
+					case KCHAR:
+						fputs("C ", fp);
+						break;
+					case STRING:
+						fputs("S ", fp);
+						break;
+				}
+				fputs(word, fp);
+				fputs("\n", fp);
+			} 
+			if(tk->id == COMA){
 				while(1){
 					if(tk->id == COMA){
 						tk = tk->next;
 						if(tk->id == VARIABLE_NAME){
+							fputs("DCL", fp);
+							switch(type){
+								case INTEGER:
+									fputs("I ", fp);
+									break;
+								case DECIMAL:
+									fputs("D ", fp);
+									break;
+								case KCHAR:
+									fputs("C ", fp);
+									break;
+								case STRING:
+									fputs("S ", fp);
+									break;
+							}
+							fputs(tk->content, fp);
+							fputs("\n", fp);
+
 							word=tk->content;
 							sy=createSymbol(word,type);
 							addSymbol(sy,t);
 							tk=tk->next;
+
 							temp = ArrayVariable(tk,fp);
 							if(temp != NULL) tk = temp;
 
@@ -264,7 +320,7 @@ struct token *Declare(struct token *tk, FILE *fp){
 								break;
 							} else {
 								printf("Unexpected token %s in line %i\n",tk->content,tk->line);
-								tk=tk->next;
+								//stk=tk->next;
 								continue;
 							}
 						} else

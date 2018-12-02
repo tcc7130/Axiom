@@ -1,1 +1,1 @@
-print(1);
+int a = 120, b, c, d;
