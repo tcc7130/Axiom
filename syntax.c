@@ -1,7 +1,15 @@
+int if_count;
+int for_count;
+int while_count;
+
 void syntax(struct tokenList *lists){
 	//printf("%i\n", lists->start->id);
 	struct token *tk;
 	struct token *temp;
+
+	if_count = 0;
+	for_count = 0;
+	while_count = 0;
 	//struct table *t;
 	// struct symbol *s=createSymbol("inicio");
 	// t->start =s;
@@ -11,8 +19,10 @@ void syntax(struct tokenList *lists){
 
 	FILE *fp;
 	fp = fopen("wall.e", "wb+");
-	if(!fp)
+	if(!fp){
 		printf("Could not create output file\n");
+		return;
+	}
 
 	while(1){
 		temp = Expression(tk, fp);
@@ -20,6 +30,7 @@ void syntax(struct tokenList *lists){
 			tk = temp;
 		else break;
 	}
+	fputs("EXT\n", fp);
 	printf("Done");
 	//Expression(tk, fp);
 }
@@ -279,36 +290,73 @@ struct token *Assign(struct token *tk, FILE *fp){
 struct token *Loop_While(struct token *tk, FILE *fp){
 	printf("LOOP_WHILE\n");
 	struct token *temp;
+	char *op = malloc(2*sizeof(char));
+	char *count = malloc(2*sizeof(char));
+	sprintf(count, "%i", while_count++);
+
+	fputs("WHILE", fp);
+	fputs(count, fp);
+	fputs(":\n", fp);
+
 	if(tk->id == KEYWORD_WHILE){
 		tk=tk->next;
 		if(tk->id == PAREN_L){
 			tk=Operand(tk->next, fp);
 			if(tk != NULL) {
-				if(tk->id == PAREN_R){
-					tk=tk->next;
-					if(tk->id == LLAVE_L){
-						tk = tk->next;
-						do{
-							printf("Looking for an expression\n");
-							temp = Expression(tk, fp);
-							if(temp!=NULL) tk = temp;
-						} while(temp != NULL);
-						if(tk->id == LLAVE_R){
-							printf("%s\n", tk->content);
-							printf("NICE\n");
-							return tk->next;
+				if(tk->id == COMPARE_OP){
+					strcpy(op, tk->content);
+					tk = Operand(tk->next, fp);
+					if(tk != NULL){
+						if(!strcmp(op, ">"))
+							fputs("CGT\n", fp);
+						if(!strcmp(op, ">="))
+							fputs("CGE\n", fp);
+						if(!strcmp(op, "<"))
+							fputs("CLT\n", fp);
+						if(!strcmp(op, "<="))
+							fputs("CLE\n", fp);
+						if(!strcmp(op, "=="))
+							fputs("CEQ\n", fp);
+						if(!strcmp(op, "!="))
+							fputs("CNE\n", fp);
+						fputs("JMPC WHILE_END", fp);
+						fputs(count, fp);
+						fputs(":\n", fp);
+						if(tk->id == PAREN_R){
+							tk=tk->next;
+							if(tk->id == LLAVE_L){
+								tk = tk->next;
+								do{
+									printf("Looking for an expression\n");
+									temp = Expression(tk, fp);
+									if(temp!=NULL) tk = temp;
+								} while(temp != NULL);
+								if(tk->id == LLAVE_R){
+									printf("%s\n", tk->content);
+									printf("NICE\n");
+
+									fputs("JMP WHILE", fp);
+									fputs(count, fp);
+									fputs(":\n", fp);
+									fputs("WHILE_END", fp);
+									fputs(count, fp);
+									fputs(":\n", fp);
+
+									return tk->next;
+								} else
+									printf("Unexpected token %s in line %i\n",tk->content,tk->line);
+							} else
+								printf("Unexpected token %s in line %i\n",tk->content,tk->line);
 						} else
-							printf("Unexpected token %s in line %i\n",tk->content,tk->line);
+							printf("Unexpected token %s in line %i\n",tk->content,tk->line);			
 					} else
-						printf("Unexpected token %s in line %i\n",tk->content,tk->line);
+						printf("Unexpected token %s in line %i\n",tk->content,tk->line);		
 				} else
-					printf("Unexpected token %s in line %i\n",tk->content,tk->line);			
+					printf("Unexpected token %s in line %i\n",tk->content,tk->line);
 			} else
-				printf("Unexpected token %s in line %i\n",tk->content,tk->line);		
-		} else
-			printf("Unexpected token %s in line %i\n",tk->content,tk->line);
-	} else
-		printf("Unexpected token %s in line %i\n",tk->content,tk->line);
+				printf("Unexpected token %s in line %i\n",tk->content,tk->line);
+			}
+		}
 	printf("LOOP_WHILE\n");
 	return NULL;
 }
