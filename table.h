@@ -21,6 +21,7 @@ struct table *createTable(){
 }
 void addSymbol(struct symbol *s, struct table *t){
 	int size=t->size;
+	
 	struct symbol *temp = malloc(sizeof(*temp));
 	if(t->start == NULL)
 		t->start = s;

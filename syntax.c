@@ -10,7 +10,6 @@ void syntax(struct tokenList *lists){
 	if_count = 0;
 	for_count = 0;
 	while_count = 0;
-	struct table *t;
 	t=createTable();
 	tk = lists->start;
 	tk = tk->next;
