@@ -1,3 +1,29 @@
+void syntax(struct tokenList *lists){
+	//printf("%i\n", lists->start->id);
+	struct token *tk;
+	struct token *temp;
+	//struct table *t;
+	// struct symbol *s=createSymbol("inicio");
+	// t->start =s;
+	// t->current=s;
+	tk = lists->start;
+	tk = tk->next;
+
+	FILE *fp;
+	fp = fopen("wall.e", "wb+");
+	if(!fp)
+		printf("Could not create output file\n");
+
+	while(1){
+		temp = Expression(tk);
+		if(temp!= NULL)
+			tk = temp;
+		else break;
+	}
+
+	//Expression(tk);
+}
+
 struct token *Expression(struct token *tk){
 	printf("EXPRESSION START: %s\n", tk->content);
 	switch(tk->id){
@@ -35,7 +61,7 @@ struct token *Expression(struct token *tk){
 		tk = tk->next;
 		printf("Omedetou\n");
 	} else
-		printf("Unexpected	 token %s in line %i\n",tk->content,tk->line);
+		printf("Unexpected token %s in line %i\n",tk->content,tk->line);
 	return tk;
 }
 
@@ -99,6 +125,7 @@ struct token *Condition(struct token *tk){
 	printf("CONDITION\n");
 	return NULL;
 }
+
 struct token *Condition_Elif(struct token *tk) {
 	struct token *temp;
 	if (tk->id == KEYWORD_ELIF) {
@@ -163,7 +190,6 @@ struct token *Condition_Elif(struct token *tk) {
 	printf("CONDITION\n");
 	return NULL;
 }
-
 
 struct token *Operation(struct token *tk){
 	return NULL;

@@ -373,27 +373,6 @@ struct tokenList *lex(FILE *fp){
     return lists;
 }
 
-void syntax(struct tokenList *lists){
-	//printf("%i\n", lists->start->id);
-	struct token *tk;
-	struct token *temp;
-	//struct table *t;
-	// struct symbol *s=createSymbol("inicio");
-	// t->start =s;
-	// t->current=s;
-	tk = lists->start;
-	tk = tk->next;
-
-	while(1){
-		temp = Expression(tk);
-		if(temp!= NULL)
-			tk = temp;
-		else break;
-	}
-
-	//Expression(tk);
-}
-
 int main(int argc, char *args[]){
 	if(!args[1]){
 		printf("Needs more arguments\n");
