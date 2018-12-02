@@ -22,7 +22,6 @@ void syntax(struct tokenList *tokens);
 
 struct token *Expression(struct token *tk, FILE *fp);
 struct token *Condition(struct token *tk, FILE *fp);
-struct token *Operation(struct token *tk, FILE *fp);
 struct token *Declare(struct token *tk, FILE *fp);
 struct token *Assign(struct token *tk, FILE *fp);
 struct token *Loop_While(struct token *tk, FILE *fp);
