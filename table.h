@@ -51,6 +51,7 @@ struct symbol *checkTypeAssign(struct symbol *s, struct token *t){
 				s->valueF = atof(t->content); 
 				break;
 			case STRING: 
+				s->valueS=malloc(sizeof(t->content));
 				strcpy(s->valueS,t->content);
 				break;
 			case KCHAR:	
@@ -93,6 +94,7 @@ struct symbol *checkTypeAssign(struct symbol *s, struct token *t){
 				s->valueF = atof(t->content);
 		}
 	} else{
+		s->valueS=malloc(sizeof(t->content));
 		strcpy(s->valueS,t->content);
 	}
 	return s;

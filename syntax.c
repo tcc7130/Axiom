@@ -158,8 +158,7 @@ struct token *Assign(struct token *tk){
 
 		if(tk->id == ASSIGN){
 			sy=checkVariable(word,t);
-			if(sy!=NULL)
-				{sy=checkTypeAssign(sy, tk->next);}
+			if(sy!=NULL) {sy=checkTypeAssign(sy, tk->next); }
 			else 
 				{printf("ERROR: Variable %s is not declared, can not assign value\n",word);}
 			tk = Operand(tk->next);
