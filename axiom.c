@@ -378,8 +378,6 @@ struct tokenList *lex(FILE *fp){
     return lists;
 }
 
-
-
 int main(int argc, char *args[]){
 	if(!args[1]){
 		printf("Needs more arguments\n");
