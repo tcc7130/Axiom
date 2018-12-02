@@ -69,35 +69,136 @@ struct token *Condition(struct token *tk, FILE *fp){
 		if(tk->id == PAREN_L){
 			tk = Operand(tk->next, fp);
 			if(tk != NULL){
-				if(tk->id == PAREN_R){
-					tk = tk->next;
-					if(tk->id == LLAVE_L){
-						tk = tk->next;
-						do{
-							printf("Looking for an expression\n");
-							temp = Expression(tk, fp);
-							if(temp!=NULL) tk = temp;
-						}while(temp != NULL);
-						if(tk->id == LLAVE_R){
-							printf("NICE\n");
-							return tk->next;
+				if(tk->id == COMPARE_OP){
+					printf("HI");
+					tk = Operand(tk->next, fp);
+					printf("BYE");
+					if(tk != NULL){
+						if(tk->id == PAREN_R){
+							printf("NICE");
+							tk = tk->next;
+							if(tk->id == LLAVE_L){
+								tk = tk->next;
+								do{
+									printf("Looking for an expression\n");
+									temp = Expression(tk, fp);
+									if(temp!=NULL) tk = temp;
+								}while(temp != NULL);
+								if(tk->id == LLAVE_R){
+									printf("NICE\n");
+									tk = tk->next;
+									if (tk->id == KEYWORD_ELSE) {
+										tk = tk->next;
+										if (tk->id == LLAVE_L) {
+											tk = tk->next;
+											do {
+												printf("Looking for an expression\n");
+												temp = Expression(tk, fp);
+												if (temp != NULL) tk = temp;
+											} while (temp != NULL);
+											if (tk->id == LLAVE_R) {
+												printf("NICE\n");
+												return tk->next;
+											}
+											else
+												printf("Unexpected token %s in line %i\n", tk->content, tk->line);
+										}
+										else
+											printf("Unexpected token %s in line %i\n", tk->content, tk->line);
+									}
+									if (tk->id== KEYWORD_ELIF) {
+										tk = Condition_Elif(tk, fp);
+										printf("NICE\n");
+
+										return tk;
+									}
+									printf("NICE\n");
+									return tk->next;
+								} else
+									printf("Unexpected token %s in line %i\n",tk->content,tk->line);
+							} else
+								printf("Unexpected token %s in line %i\n",tk->content,tk->line);						
 						} else
 							printf("Unexpected token %s in line %i\n",tk->content,tk->line);
 					} else
-						printf("Unexpected token %s in line %i\n",tk->content,tk->line);						
+						printf("Unexpected token %s in line %i\n",tk->content,tk->line);
 				} else
 					printf("Unexpected token %s in line %i\n",tk->content,tk->line);
 			} else
 				printf("Unexpected token %s in line %i\n",tk->content,tk->line);
-		} else
-			printf("Unexpected token %s in line %i\n",tk->content,tk->line);
-	} else
-		printf("Unexpected token %s in line %i\n",tk->content,tk->line);
+			}
+		}
 	printf("CONDITION\n");
 	return NULL;
 }
 
-struct token *Operation(struct token *tk, FILE *fp){
+struct token *Condition_Elif(struct token *tk, FILE *fp){
+	struct token *temp;
+	if (tk->id == KEYWORD_ELIF) {
+		tk = tk->next;
+		if (tk->id == PAREN_L) {
+			tk = Operand(tk->next, fp);
+			if (tk != NULL) {
+				if(tk->id == COMPARE_OP){
+					tk = Operand(tk->next, fp);
+					if(tk != NULL){		
+						if (tk->id == PAREN_R) {
+							tk = tk->next;
+							if (tk->id == LLAVE_L) {
+								tk = tk->next;
+								do {
+									printf("Looking for an expression\n");
+									temp = Expression(tk, fp);
+									if (temp != NULL) tk = temp;
+								} while (temp != NULL);
+								if (tk->id == LLAVE_R) {
+									tk = tk->next;
+									if (tk->id == KEYWORD_ELSE) {
+										tk = tk->next;
+										if (tk->id == LLAVE_L) {
+											tk = tk->next;
+											do {
+												printf("Looking for an expression\n");
+												temp = Expression(tk, fp);
+												if (temp != NULL) tk = temp;
+											} while (temp != NULL);
+											if (tk->id == LLAVE_R) {
+												printf("NICE\n");
+												return tk->next;
+											}
+											else
+												printf("Unexpected token %s in line %i\n", tk->content, tk->line);
+										}
+										else
+											printf("Unexpected token %s in line %i\n", tk->content, tk->line);
+									}
+									else if (tk->id == KEYWORD_ELIF) {
+										tk = Condition_Elif(tk, fp);
+									}
+									printf("NICE");
+									printf(tk->content);
+									return tk;
+								}
+								else
+									printf("Unexpected token %s in line %i\n", tk->content, tk->line);
+							}
+							else
+								printf("Unexpected token %s in line %i\n", tk->content, tk->line);
+						}
+						else
+							printf("Unexpected token %s in line %i\n", tk->content, tk->line);
+					}
+					else
+						printf("Unexpected token %s in line %i\n", tk->content, tk->line);
+				}
+				else
+					printf("Unexpected token %s in line %i\n", tk->content, tk->line);
+			}
+		}
+	}
+	else
+		printf("Unexpected token %s in line %i\n", tk->content, tk->line);
+	printf("CONDITION\n");
 	return NULL;
 }
 
@@ -411,7 +512,7 @@ struct token *Operand(struct token *tk, FILE *fp){
 
 		if(temp == NULL) tk = tk->next;
 		while(1){
-			if(tk->id == ARITMETIC_OP || tk->id == COMPARE_OP){
+			if(tk->id == ARITMETIC_OP){
 				if(top > -1){
 					if(strcmp(tk->content, "*") != 0 && strcmp(tk->content, "/") != 0){
 						printf("Current node is %s, node on top of stack is %s\n", tk->content, opStack[top]->content);
@@ -427,19 +528,15 @@ struct token *Operand(struct token *tk, FILE *fp){
 								fputs("DIV\n", fp);
 							else if(!strcmp(opStack[top]->content, "%"))
 								fputs("MOD\n", fp);
-							else if(!strcmp(opStack[top]->content, "=="))
-								fputs("CEQ\n", fp);
-							else if(!strcmp(opStack[top]->content, "!="))
-								fputs("CNE\n", fp);
-							else if(!strcmp(opStack[top]->content, ">"))
-								fputs("CGT\n", fp);
-							else if(!strcmp(opStack[top]->content, ">="))
-								fputs("CGE\n", fp);
-							else if(!strcmp(opStack[top]->content, "<"))
-								fputs("CLT\n", fp);
-							else if(!strcmp(opStack[top]->content, "<="))
-								fputs("CLE\n", fp);
 							top--;
+						}
+					}
+					else{
+						while(top > -1 && (!strcmp(opStack[top]->content, "*") || !strcmp(opStack[top]->content, "/"))){
+							if(!strcmp(opStack[top]->content, "*"))
+								fputs("MUL\n", fp);
+							else if(!strcmp(opStack[top]->content, "/"))
+								fputs("DIV\n", fp);
 						}
 					}
 				}
@@ -496,7 +593,7 @@ struct token *Operand(struct token *tk, FILE *fp){
 			}
 		}
 		printf("Found an operand, yay\n");
-		printf("Token %s at position: %i\n", opStack[top]->content, top);
+		//printf("Token %s at position: %i\n", opStack[top]->content, top);
 		while(top > -1){
 			if(!strcmp(opStack[top]->content, "+"))
 				fputs("ADD\n", fp);
