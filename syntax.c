@@ -710,8 +710,8 @@ struct token *WriteLN(struct token *tk, FILE *fp){
 }
 
 struct token *Operand(struct token *tk, FILE *fp){
-	// struct token *(opStack[32]);
-	// opStack = malloc(32*sizeof(struct token));
+	char *word;
+	struct symbol *sy;
 	struct token **opStack = malloc(32 * sizeof(struct token));
 	int top = -1;
  	printf("Starting to analyze Operand: %s\n", tk->content);
@@ -719,18 +719,23 @@ struct token *Operand(struct token *tk, FILE *fp){
 
 	if(tk->id == VARIABLE_NAME || tk->id == INTEGER || tk->id == DECIMAL || tk->id == STRING || tk->id == KCHAR){
 		if(tk->id == VARIABLE_NAME){
-			temp = ArrayVariable(tk->next, fp);
-			if(temp != NULL){
-				fputs("PUSHV ", fp);
-				fputs(tk->content, fp);
-				fputs("\n", fp);
-				tk = temp;
+			sy = checkVariable(tk->content, t);
+			if(sy != NULL){
+				temp = ArrayVariable(tk->next, fp);
+				if(temp != NULL){
+					fputs("PUSHV ", fp);
+					fputs(tk->content, fp);
+					fputs("\n", fp);
+					tk = temp;
+				}
+				else{
+					fputs("PUSH ", fp);
+					fputs(tk->content, fp);
+					fputs("\n", fp);
+				}
 			}
-			else{
-				fputs("PUSH ", fp);
-				fputs(tk->content, fp);
-				fputs("\n", fp);
-			}
+			else
+				printf("ERROR: Variable %s is not declared, can not assign value\n", tk->content);
 		}
 		else if(tk->id == INTEGER){
 			fputs("PUSHKI ", fp);
@@ -790,18 +795,23 @@ struct token *Operand(struct token *tk, FILE *fp){
 				temp = NULL;
 				if(tk->id == VARIABLE_NAME || tk->id == INTEGER || tk->id == DECIMAL || tk->id == STRING || tk->id == KCHAR){
 					if(tk->id == VARIABLE_NAME){
-						temp = ArrayVariable(tk->next, fp);
-						if(temp != NULL){
-							fputs("PUSHV ", fp);
-							fputs(tk->content, fp);
-							fputs("\n", fp);
-							tk = temp;
+						sy = checkVariable(tk->content, t);
+						if(sy != NULL){
+							temp = ArrayVariable(tk->next, fp);
+							if(temp != NULL){
+								fputs("PUSHV ", fp);
+								fputs(tk->content, fp);
+								fputs("\n", fp);
+								tk = temp;
+							}
+							else{
+								fputs("PUSH ", fp);
+								fputs(tk->content, fp);
+								fputs("\n", fp);
+							}
 						}
-						else{
-							fputs("PUSH ", fp);
-							fputs(tk->content, fp);
-							fputs("\n", fp);
-						}
+						else
+							printf("ERROR: Variable %s is not declared, can not assign value\n", tk->content);
 					}
 					else if(tk->id == INTEGER){
 						fputs("PUSHKI ", fp);
@@ -886,6 +896,7 @@ struct token *Operand(struct token *tk, FILE *fp){
 }
 
 struct token *OperandInt(struct token *tk, FILE *fp){
+	struct symbol *sy;
 	struct token **opStack = malloc(32 * sizeof(struct token));
 	int top = -1;
  	printf("Starting to analyze Operand: %s\n", tk->content);
@@ -893,21 +904,28 @@ struct token *OperandInt(struct token *tk, FILE *fp){
 
 	if(tk->id == VARIABLE_NAME || tk->id == INTEGER || tk->id == DECIMAL || tk->id == STRING || tk->id == KCHAR){
 		if(tk->id == VARIABLE_NAME){
-			temp = ArrayVariable(tk->next, fp);
-			if(temp != NULL){
-				fputs("PUSHV ", fp);
-				fputs(tk->content, fp);
-				fputs("\n", fp);
-				tk = temp;
+			sy = checkVariable(tk->content, t);
+			if(sy != NULL){
+				temp = ArrayVariable(tk->next, fp);
+				if(temp != NULL){
+					fputs("PUSHV ", fp);
+					fputs(tk->content, fp);
+					fputs("\n", fp);
+					tk = temp;
+				}
+				else{
+					fputs("PUSH ", fp);
+					fputs(tk->content, fp);
+					fputs("\n", fp);
+				}
 			}
-			else{
-				fputs("PUSH ", fp);
-				fputs(strcat(tk->content, "\n"), fp);
-			}
+			else
+				printf("ERROR: Variable %s is not declared, can not assign value\n", tk->content);
 		}
 		else if(tk->id == INTEGER){
 			fputs("PUSHKI ", fp);
-			fputs(strcat(tk->content, "\n"), fp);
+			fputs(tk->content, fp);
+			fputs("\n", fp);
 		}
  		if(temp == NULL) tk = tk->next;
 		while(1){
@@ -947,17 +965,28 @@ struct token *OperandInt(struct token *tk, FILE *fp){
 				temp = NULL;
 				if(tk->id == VARIABLE_NAME || tk->id == INTEGER){
 					if(tk->id == VARIABLE_NAME){
-						temp = ArrayVariable(tk->next, fp);
-						if(temp != NULL){
-							fputs("PUSHV ", fp);
-							fputs(tk->content, fp);
-							fputs("\n", fp);
-							tk = temp;
+						sy = checkVariable(tk->content, t);
+						if(sy != NULL){
+							temp = ArrayVariable(tk->next, fp);
+							if(temp != NULL){
+								fputs("PUSHV ", fp);
+								fputs(tk->content, fp);
+								fputs("\n", fp);
+								tk = temp;
+							}
+							else{
+								fputs("PUSH ", fp);
+								fputs(tk->content, fp);
+								fputs("\n", fp);
+							}
 						}
-						else{
-							fputs("PUSH ", fp);
-							fputs(strcat(tk->content, "\n"), fp);
-						}
+						else
+							printf("ERROR: Variable %s is not declared, can not assign value\n", tk->content);
+					}
+					else if(tk->id == INTEGER){
+						fputs("PUSHKI ", fp);
+						fputs(tk->content, fp);
+						fputs("\n", fp);
 					}
 					if(temp == NULL) tk = tk->next;
 				} 
