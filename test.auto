@@ -1,5 +1,16 @@
-int a[10], b, c, d;
+int a = 1, b = 2, c = 3;
 
-a[z + 1] = d[10] + 20 -8;
-b--;
-read(c[10]);
+if(a < 10){
+	print(" ");
+}
+elif(b < 10){
+	print(" ");
+}
+elif(c < 10){
+	print(" ");
+}
+else{
+	print("NO");
+}
+
+print("END");
