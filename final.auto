@@ -1,0 +1,19 @@
+int mat[10];
+double cal[10];
+str nom[10];
+
+for(int i = 0; i < 10; i++){
+	println("Por favor introduzca la matricula numero: ", i);
+	read(mat[i]);
+	println("Por favor introduzca el nombre numero: ", i);
+	read(nom[i]);
+	println("Por favor introduzca la calificacion numero ", i);
+	read(cal[i]);
+};
+
+int tempMat = 0;
+double tempCal = 0.0;
+str tempNom = " ";
+for(int j = 0; j < 10; j++){
+		
+};
