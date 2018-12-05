@@ -457,8 +457,7 @@ struct token *Assign(struct token *tk, FILE *fp){
 		word=tk->content;
 		tk=tk->next;
 		sy=checkVariable(word,t);
-		copy = tk;
-		temp=ArrayVariableCodeless(tk);
+		temp=ArrayVariable(tk, fp);
 		if(temp!=NULL) tk=temp;
 
 		if(tk->id == ASSIGN){
@@ -466,7 +465,6 @@ struct token *Assign(struct token *tk, FILE *fp){
 			else 
 				{printf("ERROR: Variable %s is not declared, can not assign value\n",word);}
 			tk = Operand(tk->next, fp);
-			if(temp != NULL) ArrayVariable(copy, fp);
 			if(tk != NULL){
 				if(temp == NULL)
 					fputs("POP", fp);
@@ -723,6 +721,7 @@ struct token *Read(struct token *tk, FILE *fp){
 					printf("ERROR: Variable %s is not declared, can not assign value\n", tk->content);
 				else{
 					tk=tk->next;
+					temp = ArrayVariable(tk,fp);
 					switch(sy->type){
 						case INTEGER:
 							fputs("RDI\n", fp);
@@ -737,39 +736,23 @@ struct token *Read(struct token *tk, FILE *fp){
 							fputs("RDS\n", fp);
 							break;
 					}
-					temp = ArrayVariable(tk,fp);
-					if(temp != NULL){
-						switch(sy->type){
-							case INTEGER:
-								fputs("POPVI ", fp);
-								break;
-							case DECIMAL:
-								fputs("POPVD ", fp);
-								break;
-							case KCHAR:
-								fputs("POPVC ", fp);
-								break;
-							case STRING:
-								fputs("POPVS ", fp);
-								break;
-						}
-						tk=temp;
-					}
-					else{
-						switch(sy->type){
-							case INTEGER:
-								fputs("POPI ", fp);
-								break;
-							case DECIMAL:
-								fputs("POPD ", fp);
-								break;
-							case KCHAR:
-								fputs("POPC ", fp);
-								break;
-							case STRING:
-								fputs("POPS ", fp);
-								break;
-						}
+					if(temp == NULL)
+						fputs("POP", fp);
+					else
+						fputs("POPV", fp);
+					switch(sy->type){
+						case INTEGER:
+							fputs("I ", fp);
+							break;
+						case DECIMAL:
+							fputs("D ", fp);
+							break;
+						case KCHAR:
+							fputs("C ", fp);
+							break;
+						case STRING:
+							fputs("S ", fp);
+							break;
 					}
 					fputs(word, fp);
 					fputs("\n", fp);
