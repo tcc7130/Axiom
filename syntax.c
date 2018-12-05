@@ -306,14 +306,17 @@ struct token *Declare(struct token *tk, FILE *fp){
 			sy=createSymbol(tk->content,type);
 			tk=tk->next;
 			temp = ArrayVariable(tk,fp);
-			addSymbol(sy,t);
 
 			if(temp != NULL){ 
 				tk = temp;
 				fputs("DCLV", fp);
+				sy->esVector = 1;
 			}
 			else 
 				fputs("DCL", fp);
+			
+			if(addSymbol(sy,t)==0) printf("Variable %s in line %i has already been declared\n", sy->name,tk->line);
+			addSymbol(sy,t);
 			
 			switch(type){
 				case INTEGER:
