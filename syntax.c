@@ -307,11 +307,11 @@ struct token *Declare(struct token *tk, FILE *fp){
 			tk=tk->next;
 			temp = ArrayVariable(tk,fp);
 			
-			if(addSymbol(sy,t)==0) {
+			if(checkVariable(sy->name,t) == NULL) {
 				if(temp != NULL){ 
 					tk = temp;
 					fputs("DCLV", fp);
-					sy->esVector = 1;
+					sy->isArray = 1;
 				}
 				else 
 					fputs("DCL", fp);
@@ -333,13 +333,13 @@ struct token *Declare(struct token *tk, FILE *fp){
 				fputs(word, fp);
 				fputs("\n", fp);
 				printf("WARNING: Variable %s in line %i has already been declared\n", sy->name,tk->line);
+				addSymbol(sy,t);			
 			}
-			addSymbol(sy,t);
 
 			if(tk->id == ASSIGN){
 				sy=checkVariable(word,t);
 				if(sy!=NULL)
-					{sy=checkTypeAssign(sy, tk->next);}
+					{sy=checkTypeAssign(sy, tk->next,t);}
 				else 
 					{printf("ERROR: Variable %s is not declared, can not assign value\n",word);}
 				tk = Operand(tk->next, fp);
@@ -400,7 +400,7 @@ struct token *Declare(struct token *tk, FILE *fp){
 							if(tk->id == ASSIGN){
 								sy=checkVariable(word,t);
 								if(sy!=NULL)
-									{sy=checkTypeAssign(sy, tk->next);}
+									{sy=checkTypeAssign(sy, tk->next,t);}
 								else 
 									{printf("ERROR: Variable %s is not declared, can not assign value\n",word);}
 								tk = Operand(tk->next, fp);
@@ -452,7 +452,7 @@ struct token *Declare(struct token *tk, FILE *fp){
 }
 
 struct token *Assign(struct token *tk, FILE *fp){
-	struct token *temp=NULL;
+	struct token *temp=NULL,*temp2;
 	struct symbol *sy;
 	char *word=malloc(sizeof(*word));
 
@@ -460,15 +460,19 @@ struct token *Assign(struct token *tk, FILE *fp){
 		word=tk->content;
 		tk=tk->next;
 		sy=checkVariable(word,t);
-
 		temp=ArrayVariable(tk,fp);
+
 		if(temp!=NULL) tk=temp;
 
 		if(tk->id == ASSIGN){
-			tk = Operand(tk->next, fp);
+			temp2 = Operand(tk->next, fp);
+			if(temp2->id==SEMICOLON)
+				temp2=tk->next;
+			tk=Operand(tk->next, fp);
+
 			if(sy!=NULL) {
-				sy=checkTypeAssign(sy, tk->next); 
 				if(tk != NULL){
+					sy=checkTypeAssign(sy, temp2,t); 
 					fputs("POP", fp);
 					switch(sy->type){
 						case INTEGER:
@@ -486,12 +490,10 @@ struct token *Assign(struct token *tk, FILE *fp){
 					}
 					fputs(word, fp);
 					fputs("\n", fp);
+					return tk;
 				}
-				return tk;
-			}
-			else 
-				printf("ERROR: Variable %s is not declared, can not assign value\n",word);
-			
+				else 
+				printf("ERROR: Variable %s is not declared, can not assign value\n",word);			
 			
 			} else
 				printf("Unexpected token %s in line %i\n",tk->content,tk->line);
@@ -529,7 +531,7 @@ struct token *AssignCodeless(struct token *tk){
 		if(temp!=NULL) tk=temp;
 
 		if(tk->id == ASSIGN){
-			if(sy!=NULL) {sy=checkTypeAssign(sy, tk->next); }
+			if(sy!=NULL) { sy=checkTypeAssign(sy, tk->next,t); }
 			else 
 				{printf("ERROR: Variable %s is not declared, can not assign value\n",word);}
 			tk = OperandCodeless(tk->next);

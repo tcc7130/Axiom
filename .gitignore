@@ -70,3 +70,5 @@ test.auto
 wall.e
 *.obj
 *.e
+*.e
+*.obj

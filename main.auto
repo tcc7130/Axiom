@@ -1,6 +1,5 @@
 int a, b=6;
 int b;
-str c;
+str c="e";
 a=1;
-c="te";
 str d[8];
