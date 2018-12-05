@@ -123,7 +123,7 @@ struct token *Condition(struct token *tk, FILE *fp){
 								fputs(count, fp);
 								fputs("\n", fp);
 								if(tk->id == LLAVE_R){
-									fputs("IF", fp);
+									fputs("\tIF", fp);
 									fputs(count, fp);
 									fputs("_", fp);
 									sprintf(label, "%i", labelCount++);
@@ -136,7 +136,7 @@ struct token *Condition(struct token *tk, FILE *fp){
 										printf("NICE\n");
 									}
 									else if (tk->id == KEYWORD_ELSE) {
-										fputs("IF", fp);
+										fputs("\tIF", fp);
 										fputs(count, fp);
 										fputs("_", fp);
 										sprintf(label, "%i", labelCount);
@@ -161,7 +161,7 @@ struct token *Condition(struct token *tk, FILE *fp){
 											printf("Unexpected token %s in line %i\n", tk->content, tk->line);
 									}
 									printf("NICE\n");
-									fputs("IF_END", fp);
+									fputs("\tIF_END", fp);
 									fputs(count, fp);
 									fputs(":\n", fp);
 									return tk;
@@ -233,7 +233,7 @@ struct token *Condition_Elif(struct token *tk, FILE *fp, int labelCount){
 								if (tk->id == LLAVE_R) {
 									tk = tk->next;
 									if (tk->id == KEYWORD_ELIF) {
-										fputs("IF", fp);
+										fputs("\tIF", fp);
 										fputs(count, fp);
 										fputs("_", fp);
 										sprintf(label, "%i", labelCount++);
@@ -242,7 +242,7 @@ struct token *Condition_Elif(struct token *tk, FILE *fp, int labelCount){
 										tk = Condition_Elif(tk, fp, labelCount);
 									}
 									else if (tk->id == KEYWORD_ELSE) {
-										fputs("IF", fp);
+										fputs("\tIF", fp);
 										fputs(count, fp);
 										fputs("_", fp);
 										sprintf(label, "%i", labelCount);
@@ -448,7 +448,8 @@ struct token *Declare(struct token *tk, FILE *fp){
 }
 
 struct token *Assign(struct token *tk, FILE *fp){
-	struct token *temp=NULL;
+	struct token *temp;
+	struct token *copy;
 	struct symbol *sy;
 	char *word=malloc(sizeof(*word));
 
@@ -456,8 +457,8 @@ struct token *Assign(struct token *tk, FILE *fp){
 		word=tk->content;
 		tk=tk->next;
 		sy=checkVariable(word,t);
-
-		temp=ArrayVariable(tk,fp);
+		copy = tk;
+		temp=ArrayVariableCodeless(tk);
 		if(temp!=NULL) tk=temp;
 
 		if(tk->id == ASSIGN){
@@ -465,9 +466,12 @@ struct token *Assign(struct token *tk, FILE *fp){
 			else 
 				{printf("ERROR: Variable %s is not declared, can not assign value\n",word);}
 			tk = Operand(tk->next, fp);
-			
+			if(temp != NULL) ArrayVariable(copy, fp);
 			if(tk != NULL){
-				fputs("POP", fp);
+				if(temp == NULL)
+					fputs("POP", fp);
+				else
+					fputs("POPV", fp);
 				switch(sy->type){
 					case INTEGER:
 						fputs("I ", fp);
@@ -548,7 +552,7 @@ struct token *Loop_While(struct token *tk, FILE *fp){
 	char *count = malloc(2*sizeof(char));
 	sprintf(count, "%i", while_count++);
 
-	fputs("WHILE", fp);
+	fputs("\tWHILE", fp);
 	fputs(count, fp);
 	fputs(":\n", fp);
 
@@ -592,7 +596,7 @@ struct token *Loop_While(struct token *tk, FILE *fp){
 									fputs("JMP WHILE", fp);
 									fputs(count, fp);
 									fputs("\n", fp);
-									fputs("WHILE_END", fp);
+									fputs("\tWHILE_END", fp);
 									fputs(count, fp);
 									fputs(":\n", fp);
 
@@ -630,7 +634,7 @@ struct token *Loop_For(struct token *tk, FILE *fp){
 			if(tk == NULL)
 				tk = Assign(tk->next, fp);
 			if(tk != NULL){
-				fputs("FOR", fp);
+				fputs("\tFOR", fp);
 				fputs(count, fp);
 				fputs(":\n", fp);
 				if(tk->id == SEMICOLON){
@@ -677,7 +681,7 @@ struct token *Loop_For(struct token *tk, FILE *fp){
 											if(tk->id == LLAVE_R){
 												printf("%s\n", tk->content);
 												printf("NICE\n");
-												fputs("FOR_END", fp);
+												fputs("\tFOR_END", fp);
 												fputs(count, fp);
 												fputs(":\n", fp);
 												return tk->next;
@@ -718,6 +722,7 @@ struct token *Read(struct token *tk, FILE *fp){
 				if(sy == NULL)
 					printf("ERROR: Variable %s is not declared, can not assign value\n", tk->content);
 				else{
+					tk=tk->next;
 					switch(sy->type){
 						case INTEGER:
 							fputs("RDI\n", fp);
@@ -732,7 +737,6 @@ struct token *Read(struct token *tk, FILE *fp){
 							fputs("RDS\n", fp);
 							break;
 					}
-					tk=tk->next;
 					temp = ArrayVariable(tk,fp);
 					if(temp != NULL){
 						switch(sy->type){

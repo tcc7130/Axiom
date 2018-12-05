@@ -11,9 +11,17 @@ for(int i = 0; i < 10; i++){
 	read(cal[i]);
 };
 
-int tempMat = 0;
-double tempCal = 0.0;
-str tempNom = " ";
-for(int j = 0; j < 10; j++){
-		
+int tempMat;
+for(int j = 0; j < 9; j++){
+	for(int k = 0; k < 9; k++){
+		if(mat[k] < mat[k+1]){
+			tempMat = mat[k+1];
+			mat[k+1] = mat[k];
+			mat[k] = tempMat;
+		};
+	};
+};
+
+for(int l = 0; l < 10; l++){
+	println(mat[l]);	
 };
