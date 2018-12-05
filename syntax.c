@@ -869,47 +869,31 @@ struct token *Operand(struct token *tk, FILE *fp){
 				temp = ArrayVariable(tk->next, fp);
 				if(temp != NULL){
 					fputs("PUSHV ", fp);
-					fputs(tk->content, fp);
-					fputs("\n", fp);
 					tk = temp;
 				}
-				else{
+				else
 					fputs("PUSH ", fp);
-					fputs(tk->content, fp);
-					fputs("\n", fp);
-				}
 			}
 			else
-				printf("ERROR: Variable %s is not declared, can not assign value\n", tk->content);
+				printf("ERROR: Variable %s is not declared, can not use value\n", tk->content);
 		}
-		else if(tk->id == INTEGER){
+		else if(tk->id == INTEGER)
 			fputs("PUSHKI ", fp);
-			fputs(tk->content, fp);
-			fputs("\n", fp);
-		}
-		else if(tk->id == DECIMAL){
+		else if(tk->id == DECIMAL)
 			fputs("PUSHKD ", fp);
-			fputs(tk->content, fp);
-			fputs("\n", fp);
-		}
-		else if(tk->id == STRING){
+		else if(tk->id == STRING)
 			fputs("PUSHKS ", fp);
-			fputs(tk->content, fp);
-			fputs("\n", fp);
-		}
-		else if(tk->id == KCHAR){
+		else if(tk->id == KCHAR)
 			fputs("PUSHKC ", fp);
-			fputs(tk->content, fp);
-			fputs("\n", fp);
-		}
+
+		fputs(tk->content, fp);
+		fputs("\n", fp);
  		if(temp == NULL) tk = tk->next;
 		while(1){
 			if(tk->id == ARITMETIC_OP){
 				if(top > -1){
 					if(strcmp(tk->content, "*") != 0 && strcmp(tk->content, "/") != 0){
-						printf("Current node is %s, node on top of stack is %s\n", tk->content, opStack[top]->content);
 						while(top > - 1){
-							printf("YES");
 							if(!strcmp(opStack[top]->content, "+"))
 								fputs("ADD\n", fp);
 							else if(!strcmp(opStack[top]->content, "-"))
@@ -932,9 +916,7 @@ struct token *Operand(struct token *tk, FILE *fp){
 						}
 					}
 				}
-				printf("DONE WITH\n");
 				opStack[++top] = tk;
-				printf("THe new node on tope of stack is %s\n", opStack[top]->content);
  				tk = tk->next;
 				
 				temp = NULL;
@@ -981,14 +963,12 @@ struct token *Operand(struct token *tk, FILE *fp){
 					if(temp == NULL) tk = tk->next;
 				} 
 				else {
-					printf("Unexpected token %s in line %i\n",tk->content,tk->line);
 					if(tk->id == PAREN_L){
 						tk = Operand(tk->next, fp);
-						if(tk->id == PAREN_R){
+						if(tk->id == PAREN_R)
 							tk = tk->next;
-						}
 						else {
-							printf("Unexpected token %s in line %i\n",tk->content,tk->line);
+							printf("Unexpected token %s in line %i [expected ')']\n",tk->content,tk->line);
 							return NULL;
 						}
 					} else {
@@ -1015,18 +995,6 @@ struct token *Operand(struct token *tk, FILE *fp){
 				fputs("DIV\n", fp);
 			else if(!strcmp(opStack[top]->content, "%"))
 				fputs("MOD\n", fp);
-			else if(!strcmp(opStack[top]->content, "=="))
-				fputs("CEQ\n", fp);
-			else if(!strcmp(opStack[top]->content, "!="))
-				fputs("CNE\n", fp);
-			else if(!strcmp(opStack[top]->content, ">"))
-				fputs("CGT\n", fp);
-			else if(!strcmp(opStack[top]->content, ">="))
-				fputs("CGE\n", fp);
-			else if(!strcmp(opStack[top]->content, "<"))
-				fputs("CLT\n", fp);
-			else if(!strcmp(opStack[top]->content, "<="))
-				fputs("CLE\n", fp);
 			top--;
 		}
 		return tk;
