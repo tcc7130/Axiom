@@ -11,6 +11,7 @@ struct symbol{
 	char valueC;
 	char *valueS;
 	struct symbol *next;
+	int esVector;
 };
 
 struct table *createTable(){
@@ -19,27 +20,45 @@ struct table *createTable(){
 	t->size = 0;
 	return t;
 }
-void addSymbol(struct symbol *s, struct table *t){
+
+struct symbol *checkVariable(char *word, struct table *t){
+	struct symbol *temp;
+	temp=t->start;
+	while(temp!=NULL){
+		if(!strcmp(temp->name, word))
+			return temp;
+		temp=temp->next;
+	}
+	return NULL;
+}
+
+int addSymbol(struct symbol *s, struct table *t){
 	int size = 0;
 	size = t->size;
 	struct symbol *temp = malloc(sizeof(struct symbol));
 
-	if(t->start == NULL){
-		t->start = s;
+	if(checkVariable(s->name,t) == NULL)
+	{
+		if(t->start == NULL){
+			t->start = s;
+		}
+		 else {
+		 	temp=t->start;
+		 	while(temp->next!=NULL)
+		 		temp=temp->next;
+		 	temp->next=s;		
+		}	
+		t->size = size++;
+		return 1;
 	}
-	 else {
-	 	temp=t->start;
-	 	while(temp->next!=NULL)
-	 		temp=temp->next;
-	 	temp->next=s;		
-	}
-	t->size=size+1;
+	return 0;
 }
 struct symbol *createSymbol(char *n, TokenType t){
 	struct symbol *s = malloc(sizeof(*s));
 	s->name=n;
 	s->next=NULL;
 	s->type=t;
+	s->esVector = 0;
 	return s;
 }
 
@@ -116,17 +135,6 @@ TokenType checkType(char *word){
 	return t;
 }
 
-struct symbol *checkVariable(char *word, struct table *t){
-	struct symbol *temp;
-	temp=t->start;
-	while(temp!=NULL){
-		if(!strcmp(temp->name, word))
-			return temp;
-		temp=temp->next;
-	}
-	return NULL;
-}
-
 void printTable(struct table *t){
 	struct symbol *temp;
 	if(t->start!=NULL){
@@ -134,16 +142,16 @@ void printTable(struct table *t){
 		while(temp!=NULL){
 			switch(temp->type){
 				case INTEGER: 
-					printf("Variable name: %s type: %i value: %i\n", temp->name,temp->type,temp->valueI);
+					printf("Variable name: %s type: %i value: %i es vector: %i\n", temp->name,temp->type,temp->valueI,temp->esVector);
 					break;
 				case STRING:  
-					printf("Variable name: %s type: %i value: %s\n", temp->name,temp->type,temp->valueS);
+					printf("Variable name: %s type: %i value: %s es vector: %i\n", temp->name,temp->type,temp->valueS,temp->esVector);
 					break;
 				case KCHAR:	
-					printf("Variable name: %s type: %i value: %c\n", temp->name,temp->type,temp->valueC);
+					printf("Variable name: %s type: %i value: %c es vector: %i\n", temp->name,temp->type,temp->valueC,temp->esVector);
 					break;
 				case DECIMAL:
-					printf("Variable name: %s type: %i value: %f\n", temp->name,temp->type,temp->valueF);
+					printf("Variable name: %s type: %i value: %f es vector: %i\n", temp->name,temp->type,temp->valueF,temp->esVector);
 
 			}
 			temp=temp->next;

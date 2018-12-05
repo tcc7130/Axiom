@@ -31,7 +31,7 @@ void syntax(struct tokenList *lists){
 		else break;
 	}
 	fputs("EXT\n", fp);
-	printf("Done");
+	printf("Done\n");
 }
 
 struct token *Expression(struct token *tk, FILE *fp){
@@ -306,31 +306,35 @@ struct token *Declare(struct token *tk, FILE *fp){
 			sy=createSymbol(tk->content,type);
 			tk=tk->next;
 			temp = ArrayVariable(tk,fp);
-			addSymbol(sy,t);
-
-			if(temp != NULL){ 
-				tk = temp;
-				fputs("DCLV", fp);
-			}
-			else 
-				fputs("DCL", fp);
 			
-			switch(type){
-				case INTEGER:
-					fputs("I ", fp);
-					break;
-				case DECIMAL:
-					fputs("D ", fp);
-					break;
-				case KCHAR:
-					fputs("C ", fp);
-					break;
-				case STRING:
-					fputs("S ", fp);
-					break;
+			if(addSymbol(sy,t)==0) {
+				if(temp != NULL){ 
+					tk = temp;
+					fputs("DCLV", fp);
+					sy->esVector = 1;
+				}
+				else 
+					fputs("DCL", fp);
+				
+				switch(type){
+					case INTEGER:
+						fputs("I ", fp);
+						break;
+					case DECIMAL:
+						fputs("D ", fp);
+						break;
+					case KCHAR:
+						fputs("C ", fp);
+						break;
+					case STRING:
+						fputs("S ", fp);
+						break;
+				}
+				fputs(word, fp);
+				fputs("\n", fp);
+				printf("WARNING: Variable %s in line %i has already been declared\n", sy->name,tk->line);
 			}
-			fputs(word, fp);
-			fputs("\n", fp);
+			addSymbol(sy,t);
 
 			if(tk->id == ASSIGN){
 				sy=checkVariable(word,t);
