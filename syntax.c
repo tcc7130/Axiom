@@ -465,31 +465,34 @@ struct token *Assign(struct token *tk, FILE *fp){
 		if(temp!=NULL) tk=temp;
 
 		if(tk->id == ASSIGN){
-			if(sy!=NULL) {sy=checkTypeAssign(sy, tk->next); }
-			else 
-				{printf("ERROR: Variable %s is not declared, can not assign value\n",word);}
 			tk = Operand(tk->next, fp);
-			
-			if(tk != NULL){
-				fputs("POP", fp);
-				switch(sy->type){
-					case INTEGER:
-						fputs("I ", fp);
-						break;
-					case DECIMAL:
-						fputs("D ", fp);
-						break;
-					case KCHAR:
-						fputs("C ", fp);
-						break;
-					case STRING:
-						fputs("S ", fp);
-						break;
+			if(sy!=NULL) {
+				sy=checkTypeAssign(sy, tk->next); 
+				if(tk != NULL){
+					fputs("POP", fp);
+					switch(sy->type){
+						case INTEGER:
+							fputs("I ", fp);
+							break;
+						case DECIMAL:
+							fputs("D ", fp);
+							break;
+						case KCHAR:
+							fputs("C ", fp);
+							break;
+						case STRING:
+							fputs("S ", fp);
+							break;
+					}
+					fputs(word, fp);
+					fputs("\n", fp);
 				}
-				fputs(word, fp);
-				fputs("\n", fp);
-
 				return tk;
+			}
+			else 
+				printf("ERROR: Variable %s is not declared, can not assign value\n",word);
+			
+			
 			} else
 				printf("Unexpected token %s in line %i\n",tk->content,tk->line);
 		} else if(sy != NULL && sy->type == INTEGER && (tk->id == INCREMENT || tk->id == DECREMENT)){
