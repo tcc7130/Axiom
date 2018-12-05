@@ -11,7 +11,7 @@ struct symbol{
 	char valueC;
 	char *valueS;
 	struct symbol *next;
-	int esVector;
+	int isArray;
 };
 
 struct table *createTable(){
@@ -58,7 +58,7 @@ struct symbol *createSymbol(char *n, TokenType t){
 	s->name=n;
 	s->next=NULL;
 	s->type=t;
-	s->esVector = 0;
+	s->isArray = 0;
 	return s;
 }
 
@@ -78,6 +78,9 @@ struct symbol *checkTypeAssign(struct symbol *s, struct token *t){
 				break;
 			case KCHAR:	
 				s->valueC = t->content[0];
+				break;
+			case VARIABLE_NAME:
+				
 		}
 	} else if(s->type == INTEGER){
 		switch(t->id){
@@ -142,16 +145,16 @@ void printTable(struct table *t){
 		while(temp!=NULL){
 			switch(temp->type){
 				case INTEGER: 
-					printf("Variable name: %s type: %i value: %i es vector: %i\n", temp->name,temp->type,temp->valueI,temp->esVector);
+					printf("Variable name: %s type: %i value: %i es vector: %i\n", temp->name,temp->type,temp->valueI,temp->isArray);
 					break;
 				case STRING:  
-					printf("Variable name: %s type: %i value: %s es vector: %i\n", temp->name,temp->type,temp->valueS,temp->esVector);
+					printf("Variable name: %s type: %i value: %s es vector: %i\n", temp->name,temp->type,temp->valueS,temp->isArray);
 					break;
 				case KCHAR:	
-					printf("Variable name: %s type: %i value: %c es vector: %i\n", temp->name,temp->type,temp->valueC,temp->esVector);
+					printf("Variable name: %s type: %i value: %c es vector: %i\n", temp->name,temp->type,temp->valueC,temp->isArray);
 					break;
 				case DECIMAL:
-					printf("Variable name: %s type: %i value: %f es vector: %i\n", temp->name,temp->type,temp->valueF,temp->esVector);
+					printf("Variable name: %s type: %i value: %f es vector: %i\n", temp->name,temp->type,temp->valueF,temp->isArray);
 
 			}
 			temp=temp->next;
