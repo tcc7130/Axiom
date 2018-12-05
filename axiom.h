@@ -24,6 +24,7 @@ struct token *Condition_Elif(struct token *tk, FILE *fp, int labelCount);
 struct token *Declare(struct token *tk, FILE *fp);
 struct token *Assign(struct token *tk, FILE *fp);
 struct token *AssignCodeless(struct token *tk);
+
 struct token *Loop_While(struct token *tk, FILE *fp);
 struct token *Loop_For(struct token *tk, FILE *fp);
 struct token *Read(struct token *tk, FILE *fp);
@@ -35,3 +36,4 @@ struct token *OperandInt(struct token *tk, FILE *fp);
 struct token *OperandIntCodeless(struct token *tk);
 struct token *ArrayVariable(struct token *tk, FILE *fp);
 struct token *ArrayVariableCodeless(struct token *tk);
+

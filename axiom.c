@@ -109,24 +109,15 @@ struct token *checksToken(char *word, struct token *tok,int line){
 }
 
 struct token *createToken(int id, char *word, struct token *tok, int line){
-	printf("Creating %s of length %zi\n",word, strlen(word));
 	tok->next = malloc(sizeof(struct token));
-	printf("01");
 	tok = tok->next;
-	printf("02");	
 	tok->id = id;
-	printf("03");	
 	tok->line= line;
-	printf("04");
 	tok->content = malloc(sizeof(word));
-	printf("05");
 	//strcpy(tok->content, word);
 	tok->content = strdup(word);
-	printf("06\n");
 	tok->next = NULL;
-	//printf("Found token: %s\n", tok->content);
-	//id != -1 ? printf("Found token: %s\n", tok->content) : printf("Undefined token: %s\n", tok->content); 
-	printf("Created %s\n", word);
+	id != -1 ? printf("Found token: %s\n", tok->content) : printf("Undefined token: %s\n", tok->content); 
 	return tok; 
 }
 
@@ -377,6 +368,4 @@ int main(int argc, char *args[]){
 	struct tokenList *tl = lex(fp);
 	syntax(tl);
 	printTable(t);
-	//struct symbol *s = t->start;
-	//printf("Start-> nombre: %s, tipo: %i, value: %i\n",s->name,s->type,s->valueI);
 }
