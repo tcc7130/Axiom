@@ -1,3 +1,16 @@
-while(a > b){
-	println("1");
-};
+int a = 1, b = 2, c = 3;
+
+if(a < 10){
+	print(" ");
+}
+elif(b < 10){
+	print(" ");
+}
+elif(c < 10){
+	print(" ");
+}
+else{
+	print("NO");
+}
+
+print("END");
