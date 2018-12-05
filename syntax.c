@@ -31,7 +31,7 @@ void syntax(struct tokenList *lists){
 		else break;
 	}
 	fputs("EXT\n", fp);
-	printf("Done");
+	printf("Done\n");
 }
 
 struct token *Expression(struct token *tk, FILE *fp){
@@ -68,7 +68,7 @@ struct token *Expression(struct token *tk, FILE *fp){
 		tk = tk->next;
 		printf("Omedetou\n");
 	} else
-		printf("Unexpected token %s in line %i\n",tk->content,tk->line);
+		printf("Unexpected token %s in line %i, expected ';'\n",tk->content,tk->line);
 	return tk;
 }
 
@@ -306,31 +306,35 @@ struct token *Declare(struct token *tk, FILE *fp){
 			sy=createSymbol(tk->content,type);
 			tk=tk->next;
 			temp = ArrayVariable(tk,fp);
-			addSymbol(sy,t);
-
-			if(temp != NULL){ 
-				tk = temp;
-				fputs("DCLV", fp);
-			}
-			else 
-				fputs("DCL", fp);
 			
-			switch(type){
-				case INTEGER:
-					fputs("I ", fp);
-					break;
-				case DECIMAL:
-					fputs("D ", fp);
-					break;
-				case KCHAR:
-					fputs("C ", fp);
-					break;
-				case STRING:
-					fputs("S ", fp);
-					break;
+			if(addSymbol(sy,t)==0) {
+				if(temp != NULL){ 
+					tk = temp;
+					fputs("DCLV", fp);
+					sy->esVector = 1;
+				}
+				else 
+					fputs("DCL", fp);
+				
+				switch(type){
+					case INTEGER:
+						fputs("I ", fp);
+						break;
+					case DECIMAL:
+						fputs("D ", fp);
+						break;
+					case KCHAR:
+						fputs("C ", fp);
+						break;
+					case STRING:
+						fputs("S ", fp);
+						break;
+				}
+				fputs(word, fp);
+				fputs("\n", fp);
+				printf("WARNING: Variable %s in line %i has already been declared\n", sy->name,tk->line);
 			}
-			fputs(word, fp);
-			fputs("\n", fp);
+			addSymbol(sy,t);
 
 			if(tk->id == ASSIGN){
 				sy=checkVariable(word,t);
@@ -364,7 +368,18 @@ struct token *Declare(struct token *tk, FILE *fp){
 					if(tk->id == COMA){
 						tk = tk->next;
 						if(tk->id == VARIABLE_NAME){
-							fputs("DCL", fp);
+							word=tk->content;
+							sy=createSymbol(tk->content,type);
+							tk=tk->next;
+							temp = ArrayVariable(tk,fp);
+							addSymbol(sy,t);
+							if(temp != NULL){ 
+								tk = temp;
+								fputs("DCLV", fp);
+							}
+							else 
+								fputs("DCL", fp);
+							
 							switch(type){
 								case INTEGER:
 									fputs("I ", fp);
@@ -379,16 +394,8 @@ struct token *Declare(struct token *tk, FILE *fp){
 									fputs("S ", fp);
 									break;
 							}
-							fputs(tk->content, fp);
+							fputs(word, fp);
 							fputs("\n", fp);
-
-							word=tk->content;
-							sy=createSymbol(word,type);
-							addSymbol(sy,t);
-							tk=tk->next;
-
-							temp = ArrayVariable(tk,fp);
-							if(temp != NULL) tk = temp;
 
 							if(tk->id == ASSIGN){
 								sy=checkVariable(word,t);
@@ -798,6 +805,7 @@ struct token *Read(struct token *tk, FILE *fp){
 }
 
 struct token *Write(struct token *tk, FILE *fp){
+	struct token *temp;
 	if(tk->id == KEYWORD_PRINT){
 		tk = tk->next;
 		if(tk->id == PAREN_L){
@@ -805,6 +813,16 @@ struct token *Write(struct token *tk, FILE *fp){
 			tk = Operand(tk->next, fp);
 			if(tk != NULL){
 				fputs("WRT\n", fp);
+				while(1)
+					if(tk->id == COMA){
+						temp = Operand(tk->next, fp);
+						if(temp != NULL){
+							tk = temp;
+							fputs("WRT\n", fp);
+						}
+						else return NULL;
+					}
+					else break;
 				if(tk->id == PAREN_R){
 					return tk->next;
 				} else
@@ -820,14 +838,26 @@ struct token *Write(struct token *tk, FILE *fp){
 }
 
 struct token *WriteLN(struct token *tk, FILE *fp){
+	struct token *temp;
 	if(tk->id == KEYWORD_PRINTLN){
 		tk = tk->next;
 		if(tk->id == PAREN_L){
 			printf("...\n");
 			tk = Operand(tk->next, fp);
 			if(tk != NULL){
-				fputs("WRT\nWRTLN\n", fp);
+				fputs("WRT\n", fp);
+				while(1)
+					if(tk->id == COMA){
+						temp = Operand(tk->next, fp);
+						if(temp != NULL){
+							tk = temp;
+							fputs("WRT\n", fp);
+						}
+						else return NULL;
+					}
+					else break;
 				if(tk->id == PAREN_R){
+					fputs("WRTLN\n", fp);
 					return tk->next;
 				} else
 					printf("Unexpected token %s in line %i\n",tk->content,tk->line);
