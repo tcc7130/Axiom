@@ -1,16 +1,10 @@
-int a = 1, b = 2, c = 3;
+int mat[10], nom[10], cal[10];
 
-if(a < 10){
-	print(" ");
-}
-elif(b < 10){
-	print(" ");
-}
-elif(c < 10){
-	print(" ");
-}
-else{
-	print("NO");
-}
-
-print("END");
+for(int i = 0; i < 10; i++){
+	println("Por favor introduzca la matricula numero: ", i);
+	read(mat[i]);
+	println("Por favor introduzca el nombre numero: ", i);
+	read(nom[i]);
+	println("Por favor introduzca la calificacion numero ", i);
+	read(cal[i]);
+};

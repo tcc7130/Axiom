@@ -15,15 +15,7 @@ struct token *checksToken(char *word, struct token *tok,int line){
 		for (int i = 1; i < strlen(word); i++)
 		{
 			if (!(isdigit(word[i]) || word[i] == 46)) {
-				tok->next = malloc(sizeof(struct token));
-					tok = tok->next;
-					tok->id = -1;
-					tok->line = line;
-					tok->content = malloc(sizeof(word));
-					strcpy(tok->content, word);
-					tok->next = NULL;
-					printf("Undefined token: %s\n", tok->content);
-					return tok;
+				return createToken(-1, word, tok, line);
 			}
 			if (word[i] == 46) {
 				decimal++;
@@ -104,44 +96,37 @@ struct token *checksToken(char *word, struct token *tok,int line){
 	else if(isalpha(word[0])){
 		for(int i = 1; i < strlen(word); i++){
 			if(!isalpha(word[i]) && !isdigit(word[i])){
-				//return createToken(-1, word, tok, line);
-				tok->next = malloc(sizeof(struct token));
-				tok = tok->next;
-				tok->id = -1;
-				tok->content = malloc(sizeof(word));
-				strcpy(tok->content, word);
-				tok->next = NULL;
-				printf("Undefined token: %s\n", tok->content);
-				return tok;
+				return createToken(-1, word, tok, line);
 			}
 		}
 		return createToken(VARIABLE_NAME, word, tok, line);
 	}
 	else if(strlen(word) > 0){
-		tok->next = malloc(sizeof(struct token));
-		tok = tok->next;
-		tok->id = -1;
-		tok->content = malloc(sizeof(word));
-		strcpy(tok->content, word);
-		tok->next = NULL;
-		printf("Undefined token: %s\n", tok->content);
-		return tok;
+		return createToken(-1, word, tok, line);
 	}
 	//else
 		return tok;
 }
 
 struct token *createToken(int id, char *word, struct token *tok, int line){
+	printf("Creating %s of length %zi\n",word, strlen(word));
 	tok->next = malloc(sizeof(struct token));
+	printf("01");
 	tok = tok->next;
+	printf("02");	
 	tok->id = id;
+	printf("03");	
 	tok->line= line;
+	printf("04");
 	tok->content = malloc(sizeof(word));
-	strcpy(tok->content, word);
+	printf("05");
+	//strcpy(tok->content, word);
+	tok->content = strdup(word);
+	printf("06\n");
 	tok->next = NULL;
 	//printf("Found token: %s\n", tok->content);
-	id != -1 ? printf("Found token: %s\n", tok->content) : printf("Undefined token: %s\n", tok->content); 
-
+	//id != -1 ? printf("Found token: %s\n", tok->content) : printf("Undefined token: %s\n", tok->content); 
+	printf("Created %s\n", word);
 	return tok; 
 }
 
@@ -161,10 +146,8 @@ struct tokenList *lex(FILE *fp){
 	currentToken = head;
 
 	char c;
-	char *buf = "";
+	char *buf = malloc(256);
 	char *tok = "";
-	//char *comp ;
-	//comp = malloc(255);
 
 	char word[64] = "";
 	char *word2 = "";
@@ -393,7 +376,7 @@ int main(int argc, char *args[]){
 
 	struct tokenList *tl = lex(fp);
 	syntax(tl);
-	//printTable(t);
+	printTable(t);
 	//struct symbol *s = t->start;
 	//printf("Start-> nombre: %s, tipo: %i, value: %i\n",s->name,s->type,s->valueI);
 }
