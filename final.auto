@@ -12,12 +12,22 @@ for(int i = 0; i < 10; i++){
 };
 
 int tempMat;
+double tempCal;
+str tempNom;
 for(int j = 0; j < 9; j++){
 	for(int k = 0; k < 9; k++){
 		if(mat[k] < mat[k+1]){
 			tempMat = mat[k+1];
 			mat[k+1] = mat[k];
 			mat[k] = tempMat;
+
+			tempCal = cal[k+1];
+			cal[k+1] = cal[k];
+			cal[k] = tempCal;
+
+			tempNom = nom[k+1];
+			nom[k+1] = nom[k];
+			nom[k] = tempNom;
 		};
 	};
 };
