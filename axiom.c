@@ -393,7 +393,7 @@ int main(int argc, char *args[]){
 
 	struct tokenList *tl = lex(fp);
 	syntax(tl);
-	printTable(t);
+	//printTable(t);
 	//struct symbol *s = t->start;
 	//printf("Start-> nombre: %s, tipo: %i, value: %i\n",s->name,s->type,s->valueI);
 }
