@@ -332,9 +332,9 @@ struct token *Declare(struct token *tk, FILE *fp){
 				}
 				fputs(word, fp);
 				fputs("\n", fp);
-				printf("WARNING: Variable %s in line %i has already been declared\n", sy->name,tk->line);
 				addSymbol(sy,t);			
-			}
+			} else
+				printf("WARNING: Variable %s in line %i has already been declared\n", sy->name,tk->line);
 
 			if(tk->id == ASSIGN){
 				sy=checkVariable(word,t);
@@ -493,10 +493,10 @@ struct token *Assign(struct token *tk, FILE *fp){
 					return tk;
 				}
 				else 
-				printf("ERROR: Variable %s is not declared, can not assign value\n",word);			
-			
+					printf("Unexpected token %s in line %i\n",tk->content,tk->line);			
 			} else
-				printf("Unexpected token %s in line %i\n",tk->content,tk->line);
+				printf("ERROR: Variable %s is not declared, can not assign value\n",word);			
+
 		} else if(sy != NULL && sy->type == INTEGER && (tk->id == INCREMENT || tk->id == DECREMENT)){
 			fputs("PUSHKI 1\n", fp);
 			fputs("PUSH ", fp);
@@ -511,8 +511,10 @@ struct token *Assign(struct token *tk, FILE *fp){
 			fputs("\n", fp);
 			return tk->next;
 		}
+		else if(tk->id == SEMICOLON)
+			return tk;
 		else
-			printf("Unexpected token %s in line %i\n",tk->content,tk->line);
+			printf("Unexpected token %s in line %i\n",tk->content,tk->line);			
 	} 
 	printf("ASSIGN\n");
 	return NULL;
