@@ -311,7 +311,7 @@ struct token *Declare(struct token *tk, FILE *fp){
 				if(temp != NULL){ 
 					tk = temp;
 					fputs("DCLV", fp);
-					sy->esVector = 1;
+					sy->isArray = 1;
 				}
 				else 
 					fputs("DCL", fp);
@@ -453,6 +453,7 @@ struct token *Declare(struct token *tk, FILE *fp){
 
 struct token *Assign(struct token *tk, FILE *fp){
 	struct token *temp=NULL;
+	struct token *temp2=NULL;
 	struct symbol *sy;
 	char *word=malloc(sizeof(*word));
 
@@ -465,33 +466,40 @@ struct token *Assign(struct token *tk, FILE *fp){
 		if(temp!=NULL) tk=temp;
 
 		if(tk->id == ASSIGN){
-			if(sy!=NULL) {sy=checkTypeAssign(sy, tk->next); }
-			else 
-				{printf("ERROR: Variable %s is not declared, can not assign value\n",word);}
-			tk = Operand(tk->next, fp);
-			
-			if(tk != NULL){
-				fputs("POP", fp);
-				switch(sy->type){
-					case INTEGER:
-						fputs("I ", fp);
-						break;
-					case DECIMAL:
-						fputs("D ", fp);
-						break;
-					case KCHAR:
-						fputs("C ", fp);
-						break;
-					case STRING:
-						fputs("S ", fp);
-						break;
-				}
-				fputs(word, fp);
-				fputs("\n", fp);
+			temp2=Operand(tk->next, fp);
+			if(temp2->id == SEMICOLON)
+				temp2=tk->next;
 
-				return tk;
+			tk = Operand(tk->next, fp);
+			if(sy!=NULL) {
+				if(tk != NULL){
+					sy=checkTypeAssign(sy, temp2); 
+					if(temp == NULL)
+						fputs("POP", fp);
+					else
+						fputs("POPV", fp);
+					switch(sy->type){
+						case INTEGER:
+							fputs("I ", fp);
+							break;
+						case DECIMAL:
+							fputs("D ", fp);
+							break;
+						case KCHAR:
+							fputs("C ", fp);
+							break;
+						case STRING:
+							fputs("S ", fp);
+							break;
+					}
+					fputs(sy->name, fp);
+					fputs("\n", fp);
+					return tk;
+
+				} else
+					printf("Unexpected token %s in line %i\n",tk->content,tk->line);
 			} else
-				printf("Unexpected token %s in line %i\n",tk->content,tk->line);
+				printf("ERROR: Variable %s is not declared, can not assign value\n",word);			
 		} else if(sy != NULL && sy->type == INTEGER && (tk->id == INCREMENT || tk->id == DECREMENT)){
 			fputs("PUSHKI 1\n", fp);
 			fputs("PUSH ", fp);

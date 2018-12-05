@@ -1,6 +1,11 @@
 int a, b=6;
 int b;
 str c;
+
 a=1;
-c="te";
 str d[8];
+d[4]="ss";
+
+b[0]=2;
+
+c="te";
