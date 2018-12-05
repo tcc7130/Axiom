@@ -117,7 +117,7 @@ struct token *createToken(int id, char *word, struct token *tok, int line){
 	//strcpy(tok->content, word);
 	tok->content = strdup(word);
 	tok->next = NULL;
-	id != -1 ? printf("Found token: %s\n", tok->content) : printf("Undefined token: %s\n", tok->content); 
+	if(id == -1) printf("Undefined token: %s\n", tok->content); 
 	return tok; 
 }
 
@@ -344,11 +344,11 @@ struct tokenList *lex(FILE *fp){
 		line++;
 	}
 
-	printf("LIST:\n");
-    while(head){
-    	printf("ID: %i, CONTENT: %s\n", head->id, head->content);
-    	head = head->next;
-    }
+ //	printf("LIST:\n");
+ //    while(head){
+ //    	printf("ID: %i, CONTENT: %s\n", head->id, head->content);
+ //    	head = head->next;
+ //    }
     return lists;
 }
 
@@ -367,5 +367,5 @@ int main(int argc, char *args[]){
 
 	struct tokenList *tl = lex(fp);
 	syntax(tl);
-	//printTable(t);
+	printTable(t);
 }

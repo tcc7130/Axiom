@@ -48,7 +48,7 @@ int addSymbol(struct symbol *s, struct table *t){
 		 		temp=temp->next;
 		 	temp->next=s;		
 		}	
-		t->size = size++;
+		t->size = ++size;
 		return 1;
 	}
 	return 0;
