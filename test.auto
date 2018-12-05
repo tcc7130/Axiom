@@ -1,10 +1,7 @@
-int mat[10], nom[10], cal[10];
+int a[10];
 
-for(int i = 0; i < 10; i++){
-	println("Por favor introduzca la matricula numero: ", i);
-	read(mat[i]);
-	println("Por favor introduzca el nombre numero: ", i);
-	read(nom[i]);
-	println("Por favor introduzca la calificacion numero ", i);
-	read(cal[i]);
-};
+a[0] = a[2];
+
+read(a[1]);
+
+println(1+2, "HOLA");

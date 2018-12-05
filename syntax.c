@@ -4,7 +4,6 @@ int while_count;
 struct table *t;
 
 void syntax(struct tokenList *lists){
-	//printf("%i\n", lists->start->id);
 	struct token *tk;
 	struct token *temp;
 
@@ -30,8 +29,8 @@ void syntax(struct tokenList *lists){
 			tk = temp;
 		else break;
 	}
-	fputs("EXT\n", fp);
-	printf("Done");
+	fputs("WRTLN\nEXT\n", fp);
+	printf("Done\n");
 }
 
 struct token *Expression(struct token *tk, FILE *fp){
@@ -123,7 +122,7 @@ struct token *Condition(struct token *tk, FILE *fp){
 								fputs(count, fp);
 								fputs("\n", fp);
 								if(tk->id == LLAVE_R){
-									fputs("IF", fp);
+									fputs("\tIF", fp);
 									fputs(count, fp);
 									fputs("_", fp);
 									sprintf(label, "%i", labelCount++);
@@ -136,7 +135,7 @@ struct token *Condition(struct token *tk, FILE *fp){
 										printf("NICE\n");
 									}
 									else if (tk->id == KEYWORD_ELSE) {
-										fputs("IF", fp);
+										fputs("\tIF", fp);
 										fputs(count, fp);
 										fputs("_", fp);
 										sprintf(label, "%i", labelCount);
@@ -161,7 +160,7 @@ struct token *Condition(struct token *tk, FILE *fp){
 											printf("Unexpected token %s in line %i\n", tk->content, tk->line);
 									}
 									printf("NICE\n");
-									fputs("IF_END", fp);
+									fputs("\tIF_END", fp);
 									fputs(count, fp);
 									fputs(":\n", fp);
 									return tk;
@@ -233,7 +232,7 @@ struct token *Condition_Elif(struct token *tk, FILE *fp, int labelCount){
 								if (tk->id == LLAVE_R) {
 									tk = tk->next;
 									if (tk->id == KEYWORD_ELIF) {
-										fputs("IF", fp);
+										fputs("\tIF", fp);
 										fputs(count, fp);
 										fputs("_", fp);
 										sprintf(label, "%i", labelCount++);
@@ -242,7 +241,7 @@ struct token *Condition_Elif(struct token *tk, FILE *fp, int labelCount){
 										tk = Condition_Elif(tk, fp, labelCount);
 									}
 									else if (tk->id == KEYWORD_ELSE) {
-										fputs("IF", fp);
+										fputs("\tIF", fp);
 										fputs(count, fp);
 										fputs("_", fp);
 										sprintf(label, "%i", labelCount);
@@ -306,31 +305,37 @@ struct token *Declare(struct token *tk, FILE *fp){
 			sy=createSymbol(tk->content,type);
 			tk=tk->next;
 			temp = ArrayVariable(tk,fp);
-			addSymbol(sy,t);
-
-			if(temp != NULL){ 
-				tk = temp;
-				fputs("DCLV", fp);
-			}
-			else 
-				fputs("DCL", fp);
 			
-			switch(type){
-				case INTEGER:
-					fputs("I ", fp);
-					break;
-				case DECIMAL:
-					fputs("D ", fp);
-					break;
-				case KCHAR:
-					fputs("C ", fp);
-					break;
-				case STRING:
-					fputs("S ", fp);
-					break;
+			if(addSymbol(sy,t)==1) {
+				if(temp != NULL){ 
+					tk = temp;
+					fputs("DCLV", fp);
+					sy->esVector = 1;
+				}
+				else 
+					fputs("DCL", fp);
+				
+				switch(type){
+					case INTEGER:
+						fputs("I ", fp);
+						break;
+					case DECIMAL:
+						fputs("D ", fp);
+						break;
+					case KCHAR:
+						fputs("C ", fp);
+						break;
+					case STRING:
+						fputs("S ", fp);
+						break;
+				}
+				fputs(word, fp);
+				fputs("\n", fp);
 			}
-			fputs(word, fp);
-			fputs("\n", fp);
+			else{
+				printf("WARNING: Variable %s in line %i has already been declared\n", sy->name,tk->line);
+			}
+			//addSymbol(sy,t);
 
 			if(tk->id == ASSIGN){
 				sy=checkVariable(word,t);
@@ -448,7 +453,8 @@ struct token *Declare(struct token *tk, FILE *fp){
 }
 
 struct token *Assign(struct token *tk, FILE *fp){
-	struct token *temp=NULL;
+	struct token *temp;
+	struct token *copy;
 	struct symbol *sy;
 	char *word=malloc(sizeof(*word));
 
@@ -456,8 +462,7 @@ struct token *Assign(struct token *tk, FILE *fp){
 		word=tk->content;
 		tk=tk->next;
 		sy=checkVariable(word,t);
-
-		temp=ArrayVariable(tk,fp);
+		temp=ArrayVariable(tk, fp);
 		if(temp!=NULL) tk=temp;
 
 		if(tk->id == ASSIGN){
@@ -465,9 +470,11 @@ struct token *Assign(struct token *tk, FILE *fp){
 			else 
 				{printf("ERROR: Variable %s is not declared, can not assign value\n",word);}
 			tk = Operand(tk->next, fp);
-			
 			if(tk != NULL){
-				fputs("POP", fp);
+				if(temp == NULL)
+					fputs("POP", fp);
+				else
+					fputs("POPV", fp);
 				switch(sy->type){
 					case INTEGER:
 						fputs("I ", fp);
@@ -548,7 +555,7 @@ struct token *Loop_While(struct token *tk, FILE *fp){
 	char *count = malloc(2*sizeof(char));
 	sprintf(count, "%i", while_count++);
 
-	fputs("WHILE", fp);
+	fputs("\tWHILE", fp);
 	fputs(count, fp);
 	fputs(":\n", fp);
 
@@ -592,7 +599,7 @@ struct token *Loop_While(struct token *tk, FILE *fp){
 									fputs("JMP WHILE", fp);
 									fputs(count, fp);
 									fputs("\n", fp);
-									fputs("WHILE_END", fp);
+									fputs("\tWHILE_END", fp);
 									fputs(count, fp);
 									fputs(":\n", fp);
 
@@ -630,7 +637,7 @@ struct token *Loop_For(struct token *tk, FILE *fp){
 			if(tk == NULL)
 				tk = Assign(tk->next, fp);
 			if(tk != NULL){
-				fputs("FOR", fp);
+				fputs("\tFOR", fp);
 				fputs(count, fp);
 				fputs(":\n", fp);
 				if(tk->id == SEMICOLON){
@@ -677,7 +684,7 @@ struct token *Loop_For(struct token *tk, FILE *fp){
 											if(tk->id == LLAVE_R){
 												printf("%s\n", tk->content);
 												printf("NICE\n");
-												fputs("FOR_END", fp);
+												fputs("\tFOR_END", fp);
 												fputs(count, fp);
 												fputs(":\n", fp);
 												return tk->next;
@@ -718,6 +725,8 @@ struct token *Read(struct token *tk, FILE *fp){
 				if(sy == NULL)
 					printf("ERROR: Variable %s is not declared, can not assign value\n", tk->content);
 				else{
+					tk=tk->next;
+					temp = ArrayVariable(tk,fp);
 					switch(sy->type){
 						case INTEGER:
 							fputs("RDI\n", fp);
@@ -732,40 +741,25 @@ struct token *Read(struct token *tk, FILE *fp){
 							fputs("RDS\n", fp);
 							break;
 					}
-					tk=tk->next;
-					temp = ArrayVariable(tk,fp);
-					if(temp != NULL){
-						switch(sy->type){
-							case INTEGER:
-								fputs("POPVI ", fp);
-								break;
-							case DECIMAL:
-								fputs("POPVD ", fp);
-								break;
-							case KCHAR:
-								fputs("POPVC ", fp);
-								break;
-							case STRING:
-								fputs("POPVS ", fp);
-								break;
-						}
-						tk=temp;
-					}
+					if(temp == NULL)
+						fputs("POP", fp);
 					else{
-						switch(sy->type){
-							case INTEGER:
-								fputs("POPI ", fp);
-								break;
-							case DECIMAL:
-								fputs("POPD ", fp);
-								break;
-							case KCHAR:
-								fputs("POPC ", fp);
-								break;
-							case STRING:
-								fputs("POPS ", fp);
-								break;
-						}
+						fputs("POPV", fp);
+						tk = temp;
+					}
+					switch(sy->type){
+						case INTEGER:
+							fputs("I ", fp);
+							break;
+						case DECIMAL:
+							fputs("D ", fp);
+							break;
+						case KCHAR:
+							fputs("C ", fp);
+							break;
+						case STRING:
+							fputs("S ", fp);
+							break;
 					}
 					fputs(word, fp);
 					fputs("\n", fp);
@@ -882,47 +876,31 @@ struct token *Operand(struct token *tk, FILE *fp){
 				temp = ArrayVariable(tk->next, fp);
 				if(temp != NULL){
 					fputs("PUSHV ", fp);
-					fputs(tk->content, fp);
-					fputs("\n", fp);
-					tk = temp;
 				}
-				else{
+				else
 					fputs("PUSH ", fp);
-					fputs(tk->content, fp);
-					fputs("\n", fp);
-				}
 			}
 			else
-				printf("ERROR: Variable %s is not declared, can not assign value\n", tk->content);
+				printf("ERROR: Variable %s is not declared, can not use value\n", tk->content);
 		}
-		else if(tk->id == INTEGER){
+		else if(tk->id == INTEGER)
 			fputs("PUSHKI ", fp);
-			fputs(tk->content, fp);
-			fputs("\n", fp);
-		}
-		else if(tk->id == DECIMAL){
+		else if(tk->id == DECIMAL)
 			fputs("PUSHKD ", fp);
-			fputs(tk->content, fp);
-			fputs("\n", fp);
-		}
-		else if(tk->id == STRING){
+		else if(tk->id == STRING)
 			fputs("PUSHKS ", fp);
-			fputs(tk->content, fp);
-			fputs("\n", fp);
-		}
-		else if(tk->id == KCHAR){
+		else if(tk->id == KCHAR)
 			fputs("PUSHKC ", fp);
-			fputs(tk->content, fp);
-			fputs("\n", fp);
-		}
+		fputs(tk->content, fp);
+		fputs("\n", fp);
+
  		if(temp == NULL) tk = tk->next;
+ 		else tk = temp;
 		while(1){
 			if(tk->id == ARITMETIC_OP){
 				if(top > -1){
 					if(strcmp(tk->content, "*") != 0 && strcmp(tk->content, "/") != 0){
-						printf("Current node is %s, node on top of stack is %s\n", tk->content, opStack[top]->content);
 						while(top > - 1){
-							printf("YES");
 							if(!strcmp(opStack[top]->content, "+"))
 								fputs("ADD\n", fp);
 							else if(!strcmp(opStack[top]->content, "-"))
@@ -945,9 +923,7 @@ struct token *Operand(struct token *tk, FILE *fp){
 						}
 					}
 				}
-				printf("DONE WITH\n");
 				opStack[++top] = tk;
-				printf("THe new node on tope of stack is %s\n", opStack[top]->content);
  				tk = tk->next;
 				
 				temp = NULL;
@@ -958,65 +934,43 @@ struct token *Operand(struct token *tk, FILE *fp){
 							temp = ArrayVariable(tk->next, fp);
 							if(temp != NULL){
 								fputs("PUSHV ", fp);
-								fputs(tk->content, fp);
-								fputs("\n", fp);
-								tk = temp;
 							}
-							else{
+							else
 								fputs("PUSH ", fp);
-								fputs(tk->content, fp);
-								fputs("\n", fp);
-							}
 						}
 						else
 							printf("ERROR: Variable %s is not declared, can not assign value\n", tk->content);
 					}
-					else if(tk->id == INTEGER){
+					else if(tk->id == INTEGER)
 						fputs("PUSHKI ", fp);
-						fputs(tk->content, fp);
-						fputs("\n", fp);
-					}
-					else if(tk->id == DECIMAL){
+					else if(tk->id == DECIMAL)
 						fputs("PUSHKD ", fp);
-						fputs(tk->content, fp);
-						fputs("\n", fp);
-					}
-					else if(tk->id == STRING){
+					else if(tk->id == STRING)
 						fputs("PUSHKS ", fp);
-						fputs(tk->content, fp);
-						fputs("\n", fp);
-					}
-					else if(tk->id == KCHAR){
+					else if(tk->id == KCHAR)
 						fputs("PUSHKC ", fp);
-						fputs(tk->content, fp);
-						fputs("\n", fp);
-					}
+
+					fputs(tk->content, fp);
+					fputs("\n", fp);
 					if(temp == NULL) tk = tk->next;
+					else tk = temp;
+				} 
+				else if(tk->id == PAREN_L){
+					tk = Operand(tk->next, fp);
+					if(tk->id == PAREN_R)
+						tk = tk->next;
+					else {
+						printf("Unexpected token %s in line %i [EXPECTED ')']\n",tk->content,tk->line);
+						return NULL;
+					}
 				} 
 				else {
 					printf("Unexpected token %s in line %i\n",tk->content,tk->line);
-					if(tk->id == PAREN_L){
-						tk = Operand(tk->next, fp);
-						if(tk->id == PAREN_R){
-							tk = tk->next;
-						}
-						else {
-							printf("Unexpected token %s in line %i\n",tk->content,tk->line);
-							return NULL;
-						}
-					} else {
-						printf("Unexpected token %s in line %i\n",tk->content,tk->line);
-						return NULL;
-					}
-				}				
+					return NULL;
+				}	
 			}
-			else{ 
-				printf("Unexpected token %s in line %i\n",tk->content,tk->line);
-				break;
-			}
+			else break;
 		}
-		printf("Found an operand, yay\n");
-		//printf("Token %s at position: %i\n", opStack[top]->content, top);
 		while(top > -1){
 			if(!strcmp(opStack[top]->content, "+"))
 				fputs("ADD\n", fp);
@@ -1028,27 +982,15 @@ struct token *Operand(struct token *tk, FILE *fp){
 				fputs("DIV\n", fp);
 			else if(!strcmp(opStack[top]->content, "%"))
 				fputs("MOD\n", fp);
-			else if(!strcmp(opStack[top]->content, "=="))
-				fputs("CEQ\n", fp);
-			else if(!strcmp(opStack[top]->content, "!="))
-				fputs("CNE\n", fp);
-			else if(!strcmp(opStack[top]->content, ">"))
-				fputs("CGT\n", fp);
-			else if(!strcmp(opStack[top]->content, ">="))
-				fputs("CGE\n", fp);
-			else if(!strcmp(opStack[top]->content, "<"))
-				fputs("CLT\n", fp);
-			else if(!strcmp(opStack[top]->content, "<="))
-				fputs("CLE\n", fp);
 			top--;
 		}
 		return tk;
 	} else if(tk->id == PAREN_L){
 		tk=Operand(tk->next,fp);
 		if(tk != NULL && tk->id == PAREN_R)
-			tk=tk->next;
+			return tk->next;
 		else
-			printf("Unexpected token %s in line %i op2\n",tk->content,tk->line);
+			printf("Unexpected token %s in line %i [EXPECTED ')']\n",tk->content,tk->line);
 	} 
 	return NULL;
 }
@@ -1067,32 +1009,24 @@ struct token *OperandInt(struct token *tk, FILE *fp){
 				temp = ArrayVariable(tk->next, fp);
 				if(temp != NULL){
 					fputs("PUSHV ", fp);
-					fputs(tk->content, fp);
-					fputs("\n", fp);
-					tk = temp;
 				}
-				else{
+				else
 					fputs("PUSH ", fp);
-					fputs(tk->content, fp);
-					fputs("\n", fp);
-				}
 			}
 			else
-				printf("ERROR: Variable %s is not declared, can not assign value\n", tk->content);
+				printf("ERROR: Variable %s is not declared, cannot use value\n", tk->content);
 		}
-		else if(tk->id == INTEGER){
+		else if(tk->id == INTEGER)
 			fputs("PUSHKI ", fp);
-			fputs(tk->content, fp);
-			fputs("\n", fp);
-		}
+		fputs(tk->content, fp);
+		fputs("\n", fp);
  		if(temp == NULL) tk = tk->next;
+ 		else tk = temp;
 		while(1){
 			if(tk->id == ARITMETIC_OP){
 				if(top > -1){
 					if(strcmp(tk->content, "*") != 0 && strcmp(tk->content, "/") != 0){
-						printf("Current node is %s, node on top of stack is %s\n", tk->content, opStack[top]->content);
 						while(top > - 1){
-							printf("YES");
 							if(!strcmp(opStack[top]->content, "+"))
 								fputs("ADD\n", fp);
 							else if(!strcmp(opStack[top]->content, "-"))
@@ -1115,9 +1049,7 @@ struct token *OperandInt(struct token *tk, FILE *fp){
 						}
 					}
 				}
-				printf("DONE WITH\n");
 				opStack[++top] = tk;
-				printf("THe new node on tope of stack is %s\n", opStack[top]->content);
  				tk = tk->next;
 				
 				temp = NULL;
@@ -1128,14 +1060,10 @@ struct token *OperandInt(struct token *tk, FILE *fp){
 							temp = ArrayVariable(tk->next, fp);
 							if(temp != NULL){
 								fputs("PUSHV ", fp);
-								fputs(tk->content, fp);
-								fputs("\n", fp);
 								tk = temp;
 							}
 							else{
 								fputs("PUSH ", fp);
-								fputs(tk->content, fp);
-								fputs("\n", fp);
 							}
 						}
 						else
@@ -1143,34 +1071,28 @@ struct token *OperandInt(struct token *tk, FILE *fp){
 					}
 					else if(tk->id == INTEGER){
 						fputs("PUSHKI ", fp);
-						fputs(tk->content, fp);
-						fputs("\n", fp);
 					}
+					fputs(tk->content, fp);
+					fputs("\n", fp);
 					if(temp == NULL) tk = tk->next;
+					else tk = temp;
 				} 
-				else {
-					printf("Unexpected token %s in line %i\n",tk->content,tk->line);
-					if(tk->id == PAREN_L){
-						tk = OperandInt(tk->next, fp);
-						if(tk->id == PAREN_R){
-							tk = tk->next;
-						}
-						else {
-							printf("Unexpected token %s in line %i\n",tk->content,tk->line);
-							return NULL;
-						}
-					} else {
-						printf("Unexpected token %s in line %i\n",tk->content,tk->line);
+				else if(tk->id == PAREN_L){
+					tk = OperandInt(tk->next, fp);
+					if(tk->id == PAREN_R){
+						tk = tk->next;
+					}
+					else {
+						printf("Unexpected token %s in line %i [EXPECTED ')']\n",tk->content,tk->line);
 						return NULL;
 					}
-				}				
+				} else {
+					printf("Unexpected token %s in line %i\n",tk->content,tk->line);
+					return NULL;
+				}
 			}
-			else{ 
-				printf("Unexpected token %s in line %i\n",tk->content,tk->line);
-				break;
-			}
+			else break;
 		}
-		printf("Found an operand, yay\n");
 		while(top > -1){
 			if(!strcmp(opStack[top]->content, "+"))
 				fputs("ADD\n", fp);
@@ -1190,7 +1112,7 @@ struct token *OperandInt(struct token *tk, FILE *fp){
 		if(tk != NULL && tk->id == PAREN_R)
 			tk=tk->next;
 		else
-			printf("Unexpected token %s in line %i op2\n",tk->content,tk->line);
+			printf("Unexpected token %s in line %i [EXPECTED ')']\n",tk->content,tk->line);
 	} 
 	return NULL;
 }
@@ -1215,8 +1137,7 @@ struct token *OperandCodeless(struct token *tk){
 		if(temp == NULL) tk = tk->next;
 		while(1){
 			if(tk->id == ARITMETIC_OP){
- 				tk = tk->next;
-				
+ 				tk = tk->next;	
 				temp = NULL;
 				if(tk->id == VARIABLE_NAME || tk->id == INTEGER || tk->id == DECIMAL || tk->id == STRING || tk->id == KCHAR){
 					if(tk->id == VARIABLE_NAME){
@@ -1232,37 +1153,28 @@ struct token *OperandCodeless(struct token *tk){
 					}
 					if(temp == NULL) tk = tk->next;
 				} 
-				else {
-					printf("Unexpected token %s in line %i\n",tk->content,tk->line);
-					if(tk->id == PAREN_L){
-						tk = OperandCodeless(tk->next);
-						if(tk->id == PAREN_R){
-							tk = tk->next;
-						}
-						else {
-							printf("Unexpected token %s in line %i\n",tk->content,tk->line);
-							return NULL;
-						}
-					} else {
-						printf("Unexpected token %s in line %i\n",tk->content,tk->line);
+				else if(tk->id == PAREN_L){
+					tk = OperandCodeless(tk->next);
+					if(tk->id == PAREN_R)
+						tk = tk->next;
+					else {
+						printf("Unexpected token %s in line %i [EXPECTED ')']\n",tk->content,tk->line);
 						return NULL;
 					}
-				}				
+				} else {
+					printf("Unexpected token %s in line %i\n",tk->content,tk->line);
+					return NULL;
+				}
 			}
-			else{ 
-				printf("Unexpected token %s in line %i\n",tk->content,tk->line);
-				break;
-			}
+			else break;
 		}
-		printf("Found an operand, yay\n");
-		//printf("Token %s at position: %i\n", opStack[top]->content, top);
 		return tk;
 	} else if(tk->id == PAREN_L){
 		tk=OperandCodeless(tk->next);
 		if(tk != NULL && tk->id == PAREN_R)
-			tk=tk->next;
+			return tk->next;
 		else
-			printf("Unexpected token %s in line %i op2\n",tk->content,tk->line);
+			printf("Unexpected token %s in line %i [EXPECTED ')']\n",tk->content,tk->line);
 	} 
 	return NULL;
 }
@@ -1299,36 +1211,29 @@ struct token *OperandIntCodeless(struct token *tk){
 					}
 					if(temp == NULL) tk = tk->next;
 				} 
-				else {
-					printf("Unexpected token %s in line %i\n",tk->content,tk->line);
-					if(tk->id == PAREN_L){
-						tk = OperandIntCodeless(tk->next);
-						if(tk->id == PAREN_R){
-							tk = tk->next;
-						}
-						else {
-							printf("Unexpected token %s in line %i\n",tk->content,tk->line);
-							return NULL;
-						}
-					} else {
-						printf("Unexpected token %s in line %i\n",tk->content,tk->line);
+				else if(tk->id == PAREN_L){
+					tk = OperandIntCodeless(tk->next);
+					if(tk->id == PAREN_R){
+						tk = tk->next;
+					}
+					else {
+						printf("Unexpected token %s in line %i [EXPECTED ')']\n",tk->content,tk->line);
 						return NULL;
 					}
-				}				
+				} else {
+					printf("Unexpected token %s in line %i\n",tk->content,tk->line);
+					return NULL;
+				}
 			}
-			else{ 
-				printf("Unexpected token %s in line %i\n",tk->content,tk->line);
-				break;
-			}
+			else break;
 		}
-		printf("Found an operand, yay\n");
 		return tk;
 	} else if(tk->id == PAREN_L){
 		tk=OperandIntCodeless(tk->next);
 		if(tk != NULL && tk->id == PAREN_R)
 			tk=tk->next;
 		else
-			printf("Unexpected token %s in line %i op2\n",tk->content,tk->line);
+			printf("Unexpected token %s in line %i [EXPECTED ')']\n",tk->content,tk->line);
 	} 
 	return NULL;
 }
@@ -1339,7 +1244,7 @@ struct token *ArrayVariable(struct token *tk, FILE *fp){
 		if(tk != NULL && tk->id == CORCHETE_R){
 			return tk->next;
 		} else
-			printf("Unexpected token %s in line %i\n",tk->content,tk->line);
+			printf("Unexpected token %s in line %i [EXPECTED ']']\n",tk->content,tk->line);
 	} 
 	return NULL;
 }

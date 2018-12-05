@@ -307,11 +307,11 @@ struct tokenList *lex(FILE *fp){
 				}
 
 				if(!isspace(buf[i]) && buf[i] != '(' && buf[i] != ')' 
-				&& buf[i] != '{' && buf[i] != '}' && buf[i] != '[' 
-				&& buf[i] != ']' && buf[i] != ';' && buf[i] != ','
-				&& buf[i] != '>' && buf[i] != '<' && buf[i] != '='
-				&& buf[i] != '!' && buf[i] != '-' && buf[i] != '+'
-				&& buf[i] != '/' && buf[i] != '*'){
+						&& buf[i] != '{' && buf[i] != '}' && buf[i] != '[' 
+						&& buf[i] != ']' && buf[i] != ';' && buf[i] != ','
+						&& buf[i] != '>' && buf[i] != '<' && buf[i] != '='
+						&& buf[i] != '!' && buf[i] != '-' && buf[i] != '+'
+						&& buf[i] != '/' && buf[i] != '*'){
 					word[j] = buf[i];
 					j++;
 				}
@@ -367,5 +367,5 @@ int main(int argc, char *args[]){
 
 	struct tokenList *tl = lex(fp);
 	syntax(tl);
-	printTable(t);
+	//printTable(t);
 }
