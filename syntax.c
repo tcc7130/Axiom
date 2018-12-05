@@ -887,6 +887,7 @@ struct token *Operand(struct token *tk, FILE *fp){
 								fputs("MUL\n", fp);
 							else if(!strcmp(opStack[top]->content, "/"))
 								fputs("DIV\n", fp);
+							top--;
 						}
 					}
 				}
