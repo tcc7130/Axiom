@@ -869,7 +869,6 @@ struct token *Operand(struct token *tk, FILE *fp){
 				temp = ArrayVariable(tk->next, fp);
 				if(temp != NULL){
 					fputs("PUSHV ", fp);
-					tk = temp;
 				}
 				else
 					fputs("PUSH ", fp);
@@ -885,10 +884,11 @@ struct token *Operand(struct token *tk, FILE *fp){
 			fputs("PUSHKS ", fp);
 		else if(tk->id == KCHAR)
 			fputs("PUSHKC ", fp);
-
 		fputs(tk->content, fp);
 		fputs("\n", fp);
+
  		if(temp == NULL) tk = tk->next;
+ 		else tk = temp;
 		while(1){
 			if(tk->id == ARITMETIC_OP){
 				if(top > -1){
@@ -927,63 +927,43 @@ struct token *Operand(struct token *tk, FILE *fp){
 							temp = ArrayVariable(tk->next, fp);
 							if(temp != NULL){
 								fputs("PUSHV ", fp);
-								fputs(tk->content, fp);
-								fputs("\n", fp);
-								tk = temp;
 							}
-							else{
+							else
 								fputs("PUSH ", fp);
-								fputs(tk->content, fp);
-								fputs("\n", fp);
-							}
 						}
 						else
 							printf("ERROR: Variable %s is not declared, can not assign value\n", tk->content);
 					}
-					else if(tk->id == INTEGER){
+					else if(tk->id == INTEGER)
 						fputs("PUSHKI ", fp);
-						fputs(tk->content, fp);
-						fputs("\n", fp);
-					}
-					else if(tk->id == DECIMAL){
+					else if(tk->id == DECIMAL)
 						fputs("PUSHKD ", fp);
-						fputs(tk->content, fp);
-						fputs("\n", fp);
-					}
-					else if(tk->id == STRING){
+					else if(tk->id == STRING)
 						fputs("PUSHKS ", fp);
-						fputs(tk->content, fp);
-						fputs("\n", fp);
-					}
-					else if(tk->id == KCHAR){
+					else if(tk->id == KCHAR)
 						fputs("PUSHKC ", fp);
-						fputs(tk->content, fp);
-						fputs("\n", fp);
-					}
+
+					fputs(tk->content, fp);
+					fputs("\n", fp);
 					if(temp == NULL) tk = tk->next;
+					else tk = temp;
 				} 
-				else {
-					if(tk->id == PAREN_L){
-						tk = Operand(tk->next, fp);
-						if(tk->id == PAREN_R)
-							tk = tk->next;
-						else {
-							printf("Unexpected token %s in line %i [expected ')']\n",tk->content,tk->line);
-							return NULL;
-						}
-					} else {
-						printf("Unexpected token %s in line %i\n",tk->content,tk->line);
+				else if(tk->id == PAREN_L){
+					tk = Operand(tk->next, fp);
+					if(tk->id == PAREN_R)
+						tk = tk->next;
+					else {
+						printf("Unexpected token %s in line %i [EXPECTED ')']\n",tk->content,tk->line);
 						return NULL;
 					}
-				}				
+				} 
+				else {
+					printf("Unexpected token %s in line %i\n",tk->content,tk->line);
+					return NULL;
+				}	
 			}
-			else{ 
-				printf("Unexpected token %s in line %i\n",tk->content,tk->line);
-				break;
-			}
+			else break;
 		}
-		printf("Found an operand, yay\n");
-		//printf("Token %s at position: %i\n", opStack[top]->content, top);
 		while(top > -1){
 			if(!strcmp(opStack[top]->content, "+"))
 				fputs("ADD\n", fp);
@@ -999,11 +979,12 @@ struct token *Operand(struct token *tk, FILE *fp){
 		}
 		return tk;
 	} else if(tk->id == PAREN_L){
+		printf("Paren");
 		tk=Operand(tk->next,fp);
 		if(tk != NULL && tk->id == PAREN_R)
-			tk=tk->next;
+			return tk->next;
 		else
-			printf("Unexpected token %s in line %i op2\n",tk->content,tk->line);
+			printf("Unexpected token %s in line %i [EXPECTED ')']\n",tk->content,tk->line);
 	} 
 	return NULL;
 }
@@ -1022,32 +1003,24 @@ struct token *OperandInt(struct token *tk, FILE *fp){
 				temp = ArrayVariable(tk->next, fp);
 				if(temp != NULL){
 					fputs("PUSHV ", fp);
-					fputs(tk->content, fp);
-					fputs("\n", fp);
-					tk = temp;
 				}
-				else{
+				else
 					fputs("PUSH ", fp);
-					fputs(tk->content, fp);
-					fputs("\n", fp);
-				}
 			}
 			else
-				printf("ERROR: Variable %s is not declared, can not assign value\n", tk->content);
+				printf("ERROR: Variable %s is not declared, cannot use value\n", tk->content);
 		}
-		else if(tk->id == INTEGER){
+		else if(tk->id == INTEGER)
 			fputs("PUSHKI ", fp);
-			fputs(tk->content, fp);
-			fputs("\n", fp);
-		}
+		fputs(tk->content, fp);
+		fputs("\n", fp);
  		if(temp == NULL) tk = tk->next;
+ 		else tk = temp;
 		while(1){
 			if(tk->id == ARITMETIC_OP){
 				if(top > -1){
 					if(strcmp(tk->content, "*") != 0 && strcmp(tk->content, "/") != 0){
-						printf("Current node is %s, node on top of stack is %s\n", tk->content, opStack[top]->content);
 						while(top > - 1){
-							printf("YES");
 							if(!strcmp(opStack[top]->content, "+"))
 								fputs("ADD\n", fp);
 							else if(!strcmp(opStack[top]->content, "-"))
@@ -1070,9 +1043,7 @@ struct token *OperandInt(struct token *tk, FILE *fp){
 						}
 					}
 				}
-				printf("DONE WITH\n");
 				opStack[++top] = tk;
-				printf("THe new node on tope of stack is %s\n", opStack[top]->content);
  				tk = tk->next;
 				
 				temp = NULL;
@@ -1083,14 +1054,10 @@ struct token *OperandInt(struct token *tk, FILE *fp){
 							temp = ArrayVariable(tk->next, fp);
 							if(temp != NULL){
 								fputs("PUSHV ", fp);
-								fputs(tk->content, fp);
-								fputs("\n", fp);
 								tk = temp;
 							}
 							else{
 								fputs("PUSH ", fp);
-								fputs(tk->content, fp);
-								fputs("\n", fp);
 							}
 						}
 						else
@@ -1098,10 +1065,11 @@ struct token *OperandInt(struct token *tk, FILE *fp){
 					}
 					else if(tk->id == INTEGER){
 						fputs("PUSHKI ", fp);
-						fputs(tk->content, fp);
-						fputs("\n", fp);
 					}
+					fputs(tk->content, fp);
+					fputs("\n", fp);
 					if(temp == NULL) tk = tk->next;
+					else tk = temp;
 				} 
 				else {
 					printf("Unexpected token %s in line %i\n",tk->content,tk->line);
