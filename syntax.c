@@ -12,7 +12,6 @@ void syntax(struct tokenList *lists){
 	while_count = 0;
 	//struct table *t;
 	t=createTable();
-	printf("Current table size: %i\n", t->size);
 	tk = lists->start;
 	tk = tk->next;
 
@@ -30,11 +29,10 @@ void syntax(struct tokenList *lists){
 		else break;
 	}
 	fputs("WRTLN\nEXT\n", fp);
-	printf("Done\n");
+	printf("Omedetou\n");
 }
 
 struct token *Expression(struct token *tk, FILE *fp){
-	printf("EXPRESSION START: %s\n", tk->content);
 	switch(tk->id){
 		case KEYWORD_IF:
 			tk = Condition(tk, fp);
@@ -64,11 +62,10 @@ struct token *Expression(struct token *tk, FILE *fp){
 	 		return NULL;
 	}
 	if(tk->id == SEMICOLON){
-		tk = tk->next;
-		printf("Omedetou\n");
+		return tk->next;
 	} else
-		printf("Unexpected token %s in line %i, expected ';'\n",tk->content,tk->line);
-	return tk;
+		printf("Unexpected token %s in line %i [EXPECTED ';']\n",tk->content,tk->line);
+	return NULL;
 }
 
 struct token *Condition(struct token *tk, FILE *fp){
@@ -108,12 +105,10 @@ struct token *Condition(struct token *tk, FILE *fp){
 
 					if(tk != NULL){
 						if(tk->id == PAREN_R){
-							printf("NICE");
 							tk = tk->next;
 							if(tk->id == LLAVE_L){
 								tk = tk->next;
 								do{
-									printf("Looking for an expression\n");
 									temp = Expression(tk, fp);
 									if(temp!=NULL) tk = temp;
 								}while(temp != NULL);
@@ -130,9 +125,7 @@ struct token *Condition(struct token *tk, FILE *fp){
 									fputs(":\n", fp);
 									tk = tk->next;
 									if (tk->id == KEYWORD_ELIF) {
-										printf("STARTING ELIF\n");
 										tk = Condition_Elif(tk, fp, labelCount);
-										printf("NICE\n");
 									}
 									else if (tk->id == KEYWORD_ELSE) {
 										fputs("\tIF", fp);
@@ -145,12 +138,10 @@ struct token *Condition(struct token *tk, FILE *fp){
 										if (tk->id == LLAVE_L) {
 											tk = tk->next;
 											do {
-												printf("Looking for an expression\n");
 												temp = Expression(tk, fp);
 												if (temp != NULL) tk = temp;
 											} while (temp != NULL);
 											if (tk->id == LLAVE_R) {
-												printf("NICE\n");
 												return tk->next;
 											}
 											else
@@ -159,7 +150,6 @@ struct token *Condition(struct token *tk, FILE *fp){
 										else
 											printf("Unexpected token %s in line %i\n", tk->content, tk->line);
 									}
-									printf("NICE\n");
 									fputs("\tIF_END", fp);
 									fputs(count, fp);
 									fputs(":\n", fp);
@@ -178,7 +168,6 @@ struct token *Condition(struct token *tk, FILE *fp){
 				printf("Unexpected token %s in line %i\n",tk->content,tk->line);
 			}
 		}
-	printf("CONDITION\n");
 	return NULL;
 }
 
@@ -222,7 +211,6 @@ struct token *Condition_Elif(struct token *tk, FILE *fp, int labelCount){
 							if (tk->id == LLAVE_L) {
 								tk = tk->next;
 								do {
-									printf("Looking for an expression\n");
 									temp = Expression(tk, fp);
 									if (temp != NULL) tk = temp;
 								} while (temp != NULL);
@@ -251,16 +239,13 @@ struct token *Condition_Elif(struct token *tk, FILE *fp, int labelCount){
 										if (tk->id == LLAVE_L) {
 											tk = tk->next;
 											do {
-												printf("Looking for an expression\n");
 												temp = Expression(tk, fp);
 												if (temp != NULL) tk = temp;
 											} while (temp != NULL);
-											if (tk->id == LLAVE_R) {
-												printf("NICE\n");
+											if (tk->id == LLAVE_R)
 												return tk->next;
-											}
 											else
-												printf("Unexpected token %s in line %i\n", tk->content, tk->line);
+												printf("Unexpected token %s in line %i [EXPECTED '}']\n", tk->content, tk->line);
 										}
 										else
 											printf("Unexpected token %s in line %i\n", tk->content, tk->line);
@@ -286,7 +271,6 @@ struct token *Condition_Elif(struct token *tk, FILE *fp, int labelCount){
 	}
 	else
 		printf("Unexpected token %s in line %i\n", tk->content, tk->line);
-	printf("CONDITION\n");
 	return NULL;
 }
 
@@ -440,15 +424,11 @@ struct token *Declare(struct token *tk, FILE *fp){
 					} else break;
 				}				
 			} else if(tk->id != SEMICOLON){
-				printf("Unexpected token %s in line %i ASSIGN \n",tk->content,tk->line);
-				tk=tk->next;
+				printf("Unexpected token %s in line %i [EXPECTED ';']\n",tk->content,tk->line);
 			}		
-			printf("Hi: %s\n", tk->content);
-
 			return tk;
 		}
 	}
-	printf("DECLARE\n");
 	return NULL;
 }
 
@@ -588,7 +568,6 @@ struct token *Loop_While(struct token *tk, FILE *fp){
 							if(tk->id == LLAVE_L){
 								tk = tk->next;
 								do{
-									printf("Looking for an expression\n");
 									temp = Expression(tk, fp);
 									if(temp!=NULL) tk = temp;
 								} while(temp != NULL);
@@ -645,7 +624,6 @@ struct token *Loop_For(struct token *tk, FILE *fp){
 					if(tk != NULL && tk->id == COMPARE_OP){
 						strcpy(op, tk->content);
 						tk = Operand(tk->next, fp);
-						printf("CONTENT: %s\n", tk->content);
 						if(tk != NULL){
 							if(!strcmp(op, ">"))
 								fputs("CGT\n", fp);
@@ -666,14 +644,12 @@ struct token *Loop_For(struct token *tk, FILE *fp){
 							if(tk->id == SEMICOLON){
 								step = tk->next;
 								tk=AssignCodeless(tk->next);
-								printf("SECOND CONTENT: %s\n", tk->content);
 								if(tk != NULL){
 									if(tk->id == PAREN_R){
 										tk=tk->next;
 										if(tk->id == LLAVE_L){
 											tk = tk->next;
 											do{
-												printf("Looking for an expression\n");
 												temp = Expression(tk, fp);
 												if(temp!=NULL) tk = temp;
 											} while(temp != NULL);
@@ -682,8 +658,6 @@ struct token *Loop_For(struct token *tk, FILE *fp){
 											fputs(count, fp);
 											fputs("\n", fp);
 											if(tk->id == LLAVE_R){
-												printf("%s\n", tk->content);
-												printf("NICE\n");
 												fputs("\tFOR_END", fp);
 												fputs(count, fp);
 												fputs(":\n", fp);
@@ -706,7 +680,6 @@ struct token *Loop_For(struct token *tk, FILE *fp){
 			}
 		}
 	}
-	printf("LOOP_FOR\n");
 	return NULL;
 }
 
@@ -790,7 +763,6 @@ struct token *Read(struct token *tk, FILE *fp){
 			printf("Unexpected token %s in line %i\n",tk->content,tk->line);
 	} else
 		printf("Unexpected token %s in line %i\n",tk->content,tk->line);
-	printf("READ\n");
 	return NULL;
 }
 
@@ -799,7 +771,6 @@ struct token *Write(struct token *tk, FILE *fp){
 	if(tk->id == KEYWORD_PRINT){
 		tk = tk->next;
 		if(tk->id == PAREN_L){
-			printf("...\n");
 			tk = Operand(tk->next, fp);
 			if(tk != NULL){
 				fputs("WRT\n", fp);
@@ -818,12 +789,11 @@ struct token *Write(struct token *tk, FILE *fp){
 				} else
 					printf("Unexpected token %s in line %i\n",tk->content,tk->line);
 			} else
-				printf(":( Unexpected token %s in line %i\n",tk->content,tk->line);
+				printf("Unexpected token %s in line %i\n",tk->content,tk->line);
 		} else
 			printf("Unexpected token %s in line %i\n",tk->content,tk->line);
 	} else
 		printf("Unexpected token %s in line %i\n",tk->content,tk->line);
-	printf("WRITE\n");
 	return NULL;
 }
 
@@ -832,7 +802,6 @@ struct token *WriteLN(struct token *tk, FILE *fp){
 	if(tk->id == KEYWORD_PRINTLN){
 		tk = tk->next;
 		if(tk->id == PAREN_L){
-			printf("...\n");
 			tk = Operand(tk->next, fp);
 			if(tk != NULL){
 				fputs("WRT\n", fp);
@@ -857,7 +826,6 @@ struct token *WriteLN(struct token *tk, FILE *fp){
 			printf("Unexpected token %s in line %i\n",tk->content,tk->line);
 	} else
 		printf("Unexpected token %s in line %i\n",tk->content,tk->line);
-	printf("WRITE\n");
 	return NULL;
 }
 
@@ -866,7 +834,6 @@ struct token *Operand(struct token *tk, FILE *fp){
 	struct symbol *sy;
 	struct token **opStack = malloc(32 * sizeof(struct token));
 	int top = -1;
- 	printf("Starting to analyze Operand: %s\n", tk->content);
 	struct token *temp = NULL;
 
 	if(tk->id == VARIABLE_NAME || tk->id == INTEGER || tk->id == DECIMAL || tk->id == STRING || tk->id == KCHAR){
@@ -999,7 +966,6 @@ struct token *OperandInt(struct token *tk, FILE *fp){
 	struct symbol *sy;
 	struct token **opStack = malloc(32 * sizeof(struct token));
 	int top = -1;
- 	printf("Starting to analyze Operand: %s\n", tk->content);
 	struct token *temp = NULL;
 
 	if(tk->id == VARIABLE_NAME || tk->id == INTEGER){
@@ -1122,7 +1088,6 @@ struct token *OperandCodeless(struct token *tk){
 	struct symbol *sy;
 	struct token **opStack = malloc(32 * sizeof(struct token));
 	int top = -1;
- 	printf("Starting to analyze Operand: %s\n", tk->content);
 	struct token *temp = NULL;
 
 	if(tk->id == VARIABLE_NAME || tk->id == INTEGER || tk->id == DECIMAL || tk->id == STRING || tk->id == KCHAR){
@@ -1183,7 +1148,6 @@ struct token *OperandIntCodeless(struct token *tk){
 	struct symbol *sy;
 	struct token **opStack = malloc(32 * sizeof(struct token));
 	int top = -1;
- 	printf("Starting to analyze Operand: %s\n", tk->content);
 	struct token *temp = NULL;
 
 	if(tk->id == VARIABLE_NAME || tk->id == INTEGER || tk->id == DECIMAL || tk->id == STRING || tk->id == KCHAR){
