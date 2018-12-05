@@ -33,5 +33,7 @@ for(int j = 0; j < 9; j++){
 };
 
 for(int l = 0; l < 10; l++){
-	println(mat[l]);	
+	println(mat[l]);
+	println(nom[l]);
+	println(cal[l]);	
 };

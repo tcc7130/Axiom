@@ -4,7 +4,6 @@ int while_count;
 struct table *t;
 
 void syntax(struct tokenList *lists){
-	//printf("%i\n", lists->start->id);
 	struct token *tk;
 	struct token *temp;
 
@@ -30,7 +29,7 @@ void syntax(struct tokenList *lists){
 			tk = temp;
 		else break;
 	}
-	fputs("EXT\n", fp);
+	fputs("WRTLN\nEXT\n", fp);
 	printf("Done\n");
 }
 
@@ -307,7 +306,7 @@ struct token *Declare(struct token *tk, FILE *fp){
 			tk=tk->next;
 			temp = ArrayVariable(tk,fp);
 			
-			if(addSymbol(sy,t)==0) {
+			if(addSymbol(sy,t)==1) {
 				if(temp != NULL){ 
 					tk = temp;
 					fputs("DCLV", fp);
@@ -332,9 +331,11 @@ struct token *Declare(struct token *tk, FILE *fp){
 				}
 				fputs(word, fp);
 				fputs("\n", fp);
+			}
+			else{
 				printf("WARNING: Variable %s in line %i has already been declared\n", sy->name,tk->line);
 			}
-			addSymbol(sy,t);
+			//addSymbol(sy,t);
 
 			if(tk->id == ASSIGN){
 				sy=checkVariable(word,t);
@@ -742,8 +743,10 @@ struct token *Read(struct token *tk, FILE *fp){
 					}
 					if(temp == NULL)
 						fputs("POP", fp);
-					else
+					else{
 						fputs("POPV", fp);
+						tk = temp;
+					}
 					switch(sy->type){
 						case INTEGER:
 							fputs("I ", fp);
