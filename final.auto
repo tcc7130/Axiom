@@ -12,11 +12,14 @@ for(int i = 0; i < 10; i++){
 };
 
 int tempMat;
+int tempMat;
 double tempCal;
 str tempNom;
+
+int k = 0;
 for(int j = 0; j < 9; j++){
-	for(int k = 0; k < 9; k++){
-		if(mat[k] < mat[k+1]){
+	for(k = 0; k < 9; k++){
+		if(mat[k] > mat[k+1]){
 			tempMat = mat[k+1];
 			mat[k+1] = mat[k];
 			mat[k] = tempMat;
@@ -33,7 +36,7 @@ for(int j = 0; j < 9; j++){
 };
 
 for(int l = 0; l < 10; l++){
-	println(mat[l]);
-	println(nom[l]);
-	println(cal[l]);	
+	println("MATRICULA: ", mat[l]);
+	println("CALIFICACION: ", cal[l]);
+	println("NOMBRE: ", nom[l]);	
 };

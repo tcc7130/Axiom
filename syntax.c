@@ -10,8 +10,8 @@ void syntax(struct tokenList *lists){
 	if_count = 0;
 	for_count = 0;
 	while_count = 0;
-	//struct table *t;
-	t=createTable();
+
+	t = createTable();
 	tk = lists->start;
 	tk = tk->next;
 
@@ -414,11 +414,7 @@ struct token *Declare(struct token *tk, FILE *fp){
 								}
 							} else if(tk->id == SEMICOLON){
 								break;
-							} else {
-								printf("Unexpected token %s in line %i\n",tk->content,tk->line);
-								//stk=tk->next;
-								continue;
-							}
+							} else continue;
 						} else
 							printf("Unexpected token %s in line %i\n",tk->content,tk->line);
 					} else break;
@@ -447,8 +443,10 @@ struct token *Assign(struct token *tk, FILE *fp){
 
 		if(tk->id == ASSIGN){
 			if(sy!=NULL) {sy=checkTypeAssign(sy, tk->next); }
-			else 
-				{printf("ERROR: Variable %s is not declared, can not assign value\n",word);}
+			else {
+				printf("ERROR: Variable %s is not declared, can not assign value\n",word);
+				return NULL;
+			}
 			tk = Operand(tk->next, fp);
 			if(tk != NULL){
 				if(temp == NULL)
@@ -612,9 +610,11 @@ struct token *Loop_For(struct token *tk, FILE *fp){
 	if(tk->id == KEYWORD_FOR){
 		tk=tk->next;
 		if(tk->id == PAREN_L){
-			tk = Declare(tk->next, fp);
-			if(tk == NULL)
-				tk = Assign(tk->next, fp);
+			temp = Declare(tk->next, fp);
+			if(temp == NULL){
+				temp = Assign(tk->next, fp);
+			}
+			if(temp != NULL) tk = temp;
 			if(tk != NULL){
 				fputs("\tFOR", fp);
 				fputs(count, fp);

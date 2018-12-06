@@ -1,6 +1,15 @@
-int a, b=6;
-int b;
-str c;
-a=1;
-c="te";
-str d[8];
+int a, b, c;
+a = 2;
+b=4;
+c=15;
+int d[4];
+d[2] = 9;
+if(d[2]>a){
+	if(b>a){
+		print("jaja");
+	};
+} elif(c>b){
+	print("jaja1");
+} else {
+	print("jaja3");
+};

@@ -165,7 +165,7 @@ struct tokenList *lex(FILE *fp){
 						currentToken = checksToken(word, currentToken,line);
 						memset(word, 0, sizeof(word));
 						j = 0;
-						currentToken = checksToken(";", currentToken,line);
+						currentToken = createToken(SEMICOLON, ";", currentToken,line);
 						break;
 					case ',':
 						currentToken = checksToken(word, currentToken,line);
@@ -344,11 +344,14 @@ struct tokenList *lex(FILE *fp){
 		line++;
 	}
 
- //	printf("LIST:\n");
- //    while(head){
- //    	printf("ID: %i, CONTENT: %s\n", head->id, head->content);
- //    	head = head->next;
- //    }
+ 	printf("LIST:\n");
+    while(head){
+    	if(head->id == -1){
+    		printf("ERROR: Can not generate code\n");
+    		return NULL;
+    	}
+    	head = head->next;
+    }
     return lists;
 }
 
